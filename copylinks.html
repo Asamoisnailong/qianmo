@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>请复制到酒馆助手进行听歌</title>
+<style>
+  :root{
+    --paper:#fdfcf6;
+    --paper-2:#f7f4e9;
+    --ink:#2c2a26;
+    --ink-soft:#6b665c;
+    --line:#e2ddce;
+    --accent:#c9644b;
+    --shadow:0 1px 2px rgba(60,55,45,.18),0 12px 30px -12px rgba(60,55,45,.35);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Songti SC","STSong","SimSun","Noto Serif SC",Georgia,serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 700px at 80% -10%, #d8dde6 0%, rgba(216,221,230,0) 60%),
+      radial-gradient(900px 600px at -10% 110%, #e3ddd0 0%, rgba(227,221,208,0) 55%),
+      linear-gradient(135deg,#b9c0cd 0%,#9aa3b2 100%);
+    min-height:100%;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:56px 20px 80px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* 胶带 */
+  .tape{
+    position:absolute;
+    top:-16px;
+    left:50%;
+    transform:translateX(-50%) rotate(-2deg);
+    width:112px;
+    height:32px;
+    background:rgba(245,238,205,.62);
+    box-shadow:0 1px 3px rgba(80,75,55,.25),inset 0 0 14px rgba(180,160,90,.25);
+    backdrop-filter:blur(2px);
+    z-index:5;
+  }
+  .tape::before,..tape::after{
+    content:"";
+    position:absolute;
+    top:0;bottom:0;width:9px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
+  }
+  .tape::before{left:14px}
+  .tape::after{right:14px}
+
+  /* 纸片 */
+  .paper{
+    position:relative;
+    width:min(720px,100%);
+    background:
+      linear-gradient(var(--paper) 0 0) padding-box,
+      var(--paper);
+    border-radius:2px;
+    padding:52px 54px 40px;
+    box-shadow:var(--shadow);
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(201,100,75,.05), transparent 45%),
+      radial-gradient(circle at 88% 92%, rgba(80,110,140,.06), transparent 50%),
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 31px,
+        rgba(90,130,175,.22) 31px,
+        rgba(90,130,175,.22) 32px
+      );
+    background-color:var(--paper);
+  }
+  /* 纸纹噪点 */
+  .paper::before{
+    content:"";
+    position:absolute;inset:0;
+    pointer-events:none;
+    opacity:.5;
+    mix-blend-mode:multiply;
+    background-image:
+      radial-gradient(rgba(120,110,90,.05) 1px, transparent 1px),
+      radial-gradient(rgba(120,110,90,.04) 1px, transparent 1px);
+    background-size:5px 5px, 9px 9px;
+    background-position:0 0, 2px 2px;
+  }
+  /* 轻微翘边 */
+  .paper::after{
+    content:"";
+    position:absolute;
+    left:3%; right:3%; bottom:-6px; height:14px;
+    background:rgba(50,45,35,.18);
+    filter:blur(8px);
+    z-index:-1;
+    border-radius:50%;
+  }
+
+  .head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:18px;
+    margin-bottom:10px;
+    padding-bottom:14px;
+    border-bottom:1.5px dashed var(--line);
+  }
+  .head h1{
+    font-size:30px;
+    font-weight:600;
+    letter-spacing:.04em;
+    line-height:1.2;
+  }
+  .head .sub{
+    font-size:13px;
+    color:var(--ink-soft);
+    letter-spacing:.14em;
+    margin-top:6px;
+  }
+  .count{
+    font-size:13px;
+    color:var(--ink-soft);
+    white-space:nowrap;
+    padding-bottom:4px;
+  }
+  .count b{color:var(--accent);font-size:16px;font-weight:600}
+
+  .field{
+    position:relative;
+    margin-top:26px;
+  }
+  textarea{
+    width:100%;
+    min-height:330px;
+    resize:vertical;
+    border:none;
+    outline:none;
+    background:transparent;
+    color:var(--ink);
+    font-family:inherit;
+    font-size:15.5px;
+    line-height:32px;
+    letter-spacing:.01em;
+    padding:2px 4px 2px 6px;
+    white-space:pre-wrap;
+    word-break:break-all;
+  }
+  textarea::selection{background:rgba(201,100,75,.28)}
+
+  .toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-top:22px;
+    padding-top:14px;
+    border-top:1.5px dashed var(--line);
+    flex-wrap:wrap;
+  }
+  .hint{font-size:12.5px;color:var(--ink-soft);letter-spacing:.03em}
+  .hint kbd{
+    font-family:inherit;
+    font-size:12px;
+    padding:1px 6px;
+    border:1px solid var(--line);
+    border-bottom-width:2px;
+    border-radius:3px;
+    background:var(--paper-2);
+    color:var(--ink-soft);
+    margin:0 2px;
+  }
+  .btn{
+    position:relative;
+    font-family:inherit;
+    font-size:15px;
+    letter-spacing:.08em;
+    color:#fdfcf6;
+    background:var(--accent);
+    border:none;
+    padding:11px 30px;
+    border-radius:2px;
+    cursor:pointer;
+    box-shadow:0 2px 0 #a64c37, 0 6px 14px -6px rgba(120,55,40,.6);
+    transition:transform .08s ease, box-shadow .08s ease, background .2s ease;
+  }
+  .btn:hover{background:#d26d53}
+  .btn:active{transform:translateY(2px);box-shadow:0 0 0 #a64c37, 0 2px 6px -4px rgba(120,55,40,.6)}
+  .btn.ok{background:#4f7a52;box-shadow:0 2px 0 #3a5c3d, 0 6px 14px -6px rgba(50,90,55,.6)}
+  .btn.ok:hover{background:#5b875e}
+
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:34px;
+    transform:translate(-50%,14px);
+    font-family:inherit;
+    font-size:14.5px;
+    letter-spacing:.06em;
+    color:#fdfcf6;
+    background:rgba(44,42,38,.94);
+    padding:11px 26px;
+    border-radius:2px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+    z-index:99;
+    box-shadow:0 10px 30px -10px rgba(0,0,0,.5);
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  @media (max-width:560px){
+    body{padding:40px 12px 60px}
+    .paper{padding:44px 24px 30px}
+    .head h1{font-size:23px}
+    textarea{min-height:280px;font-size:14.5px}
+  }
+</style>
+</head>
+<body>
+  <main class="paper">
+    <span class="tape" aria-hidden="true"></span>
+
+    <div class="head">
+      <div>
+        <h1>请复制到酒馆助手进行听歌</h1>
+        <div class="sub">SONG&nbsp;&nbsp;L I N K S</div>
+      </div>
+      <div class="count">共 <b id="cnt">0</b> 条</div>
+    </div>
+
+    <div class="field">
+      <textarea id="box" spellcheck="false"></textarea>
+    </div>
+
+    <div class="toolbar">
+      <div class="hint">一行一条，可自由增删 &nbsp;·&nbsp; <kbd>Ctrl</kbd>+<kbd>A</kbd> 全选</div>
+      <button class="btn" id="copyBtn" type="button">一键复制</button>
+    </div>
+  </main>
+
+  <div class="toast" id="toast">已复制到剪贴板</div>
+
+<script>
+  const links = [
+    "https://Asamoisnailong.github.io/qianmo/%E8%BE%9B%E5%B3%B6%E7%B4%94%E5%AD%90%20-%20TRUE%E2%99%A5%EF%B8%8ELOVE_1794227334442_99e9v.mp3",
+    "https://Asamoisnailong.github.io/qianmo/%E6%89%93%E7%81%AB%E6%9C%BA%EF%BC%88%E6%B5%81%E6%B5%AA%E8%80%85%E7%89%88%EF%BC%89_1794227326729_6y698.mp3",
+    "https://Asamoisnailong.github.io/qianmo/%E6%88%91%E6%83%B3%E8%A6%81%E5%8D%A0%E6%8D%AE%E4%BD%A0%EF%BC%88Cover%E6%B5%81%E6%B5%AA%E8%80%85%EF%BC%89_1794227320615_v751x.mp3",
+    "https://Asamoisnailong.github.io/qianmo/%E6%9C%88%E3%81%8C%E7%B6%BA%E9%BA%97%E3%81%AD%E3%81%A8%E8%A8%80%E3%82%8F%E3%82%8C%E3%81%9F%E3%81%84_1794228212562_8hciv.mp3",
+    "https://Asamoisnailong.github.io/qianmo/CityOfStars_1794228215945_jza8b.mp3",
+    "https://Asamoisnailong.github.io/qianmo/%E5%9B%9E%E5%BF%86%E6%A0%BC%E5%BC%8F%E5%8C%96_1794228218516_1abxb.mp3"
+  ];
+
+  const box   = document.getElementById('box');
+  const cnt   = document.getElementById('cnt');
+  const btn   = document.getElementById('copyBtn');
+  const toast = document.getElementById('toast');
+
+  function recount(){
+    const n = box.value.split(/\n/).filter(l => l.trim().length).length;
+    cnt.textContent = n;
+  }
+
+  box.value = links.join('\n');
+  recount();
+
+  box.addEventListener('input', recount);
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  async function copyText(text){
+    if (navigator.clipboard && window.isSecureContext){
+      try{ await navigator.clipboard.writeText(text); return true; } catch(e){}
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    let ok = false;
+    try{ ok = document.execCommand('copy'); } catch(e){ ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  btn.addEventListener('click', async () => {
+    const text = box.value;
+    if (!text.trim()){
+      showToast('里面还没有内容');
+      return;
+    }
+    const ok = await copyText(text);
+    if (ok){
+      btn.classList.add('ok');
+      btn.textContent = '已复制 ✓';
+      showToast('已复制 ' + cnt.textContent + ' 条链接');
+      setTimeout(() => {
+        btn.classList.remove('ok');
+        btn.textContent = '一键复制';
+      }, 1800);
+    } else {
+      showToast('复制失败，可手动全选复制');
+    }
+  });
+</script>
+</body>
+</html>
