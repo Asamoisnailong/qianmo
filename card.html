@@ -14,14 +14,20 @@
     font-display: swap;
   }
 
-  body {
+  html, body {
     margin: 0;
-    min-height: 100vh;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    position: fixed;                     /* 移动端彻底锁死滚动 */
+    overflow: hidden;
+    overscroll-behavior: none;           /* 禁止回弹 */
+    -webkit-overflow-scrolling: auto;
+    touch-action: none;                  /* 禁止浏览器接管触摸手势 */
     background: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
   }
 
   .container {
@@ -33,7 +39,7 @@
     background: transparent;
     border-radius: 20px;
     cursor: pointer;
-    touch-action: manipulation;
+    touch-action: none;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
@@ -106,7 +112,7 @@
     background-image:
       radial-gradient(circle, rgba(255,251,246,0.938) 2.2px, transparent 3.2px),
       radial-gradient(circle, rgba(255,253,249,0.728) 2.8px, transparent 3.8px),
-      radial-gradient(circle, rgba(262,258,254,0.882) 1.6px, transparent 2.6px);
+      radial-gradient(circle, rgba(255,253,254,0.882) 1.6px, transparent 2.6px);
     background-size: 46px 45px, 76px 70px, 156px 150px;
     background-position: 2px 0, 28px 22px, 54px 68px;
     animation: snowFallNear 16s linear infinite;
@@ -259,7 +265,7 @@
 </div>
 
 <script>
-  // ========== 缩放适配（固定一次，不再监听resize） ==========
+  // ========== 缩放适配 ==========
   const container = document.getElementById('container');
   const BASE_W = 964;
   const BASE_H = 644;
@@ -281,8 +287,9 @@
 
   function onMove(clientX, clientY) {
     const rect = container.getBoundingClientRect();
-    const rawX = (clientX - rect.left) / parseFloat(container.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1);
-    const rawY = (clientY - rect.top) / parseFloat(container.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1);
+    const scaleVal = parseFloat(container.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1);
+    const rawX = (clientX - rect.left) / scaleVal;
+    const rawY = (clientY - rect.top) / scaleVal;
     const cx = BASE_W / 2;
     const cy = BASE_H / 2;
     targetX = (rawX - cx) / (BASE_W / 2);
@@ -290,14 +297,17 @@
   }
 
   container.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+
+  // 关键：passive 必须为 false，才能 preventDefault 锁死滚动
   container.addEventListener('touchmove', e => {
+    e.preventDefault();
     if (e.touches.length) onMove(e.touches[0].clientX, e.touches[0].clientY);
-  }, { passive: true });
+  }, { passive: false });
+
   container.addEventListener('mouseleave', () => { targetX = 0; targetY = 0; });
   container.addEventListener('touchend', () => { targetX = 0; targetY = 0; });
 
   // ========== 所有动画合并到一个 RAF ==========
-  // 红绳状态
   const mainThread = document.getElementById('mainThreadPath');
   const mw = 524, mh = 523;
   let angleMain = 0;
@@ -314,6 +324,10 @@
     // --- 视差 ---
     curX += (targetX - curX) * 0.014;
     curY += (targetY - curY) * 0.013;
+
+    // 钳制在 [-1, 1]，防止飞出抖动
+    curX = Math.max(-1, Math.min(1, curX));
+    curY = Math.max(-1, Math.min(1, curY));
 
     layers.forEach(layer => {
       const depth = parseFloat(layer.dataset.depth || '1');
@@ -381,7 +395,9 @@
   }
   mainLoop();
 
-  // ========== 点击迸发效果 ==========
+  // ========== 点击迸发效果（去重） ==========
+  let lastBurstTime = 0;
+
   container.addEventListener('click', function(e) {
     const rect = container.getBoundingClientRect();
     const scaleVal = parseFloat(container.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1);
@@ -398,9 +414,13 @@
       const rawY = (e.touches[0].clientY - rect.top) / scaleVal;
       burstSnow(rawX, rawY);
     }
-  }, { passive: true });
+  }, { passive: false });
 
   function burstSnow(cx, cy) {
+    const now = Date.now();
+    if (now - lastBurstTime < 200) return;   // 200ms 内只触发一次
+    lastBurstTime = now;
+
     const count = 40;
     const fragment = document.createDocumentFragment();
     for (let i = 0; i < count; i++) {
