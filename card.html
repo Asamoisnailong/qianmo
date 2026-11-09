@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>碎雪视差·稳定平滑版</title>
+<title>碎雪视差·纯净静态版</title>
 <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet">
 <style>
   @font-face {
@@ -22,7 +22,7 @@
     position: fixed;
     overflow: hidden;
     overscroll-behavior: none;
-    /* ★ 修改：允许垂直滑动，不再锁死页面 */
+    /* 允许正常的上下滑动 */
     touch-action: pan-y; 
     background: #ffffff;
     display: flex;
@@ -38,7 +38,6 @@
     overflow: hidden;
     background: transparent;
     border-radius: 20px;
-    cursor: pointer;
     touch-action: pan-y;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
@@ -46,7 +45,6 @@
 
   .layer {
     position: absolute;
-    will-change: transform;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
@@ -133,7 +131,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transform-style: preserve-3d;
   }
   .top-img-wrapper img {
     width: 86%;
@@ -161,7 +158,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transform-style: preserve-3d;
     pointer-events: none;
   }
   .corner-wrapper img {
@@ -192,7 +188,6 @@
     filter: blur(0.35px);
     text-shadow: 0 0 4px rgba(142, 140, 135, 0.002), 0 0 10px rgba(152, 155, 151, 0.001);
     letter-spacing: 0.4px;
-    transform-style: preserve-3d;
     position: absolute;
   }
   .text-block p {
@@ -221,25 +216,25 @@
 <body>
 
 <div class="container" id="container">
-  <div class="layer bottom-bg" data-depth="0.15">
+  <div class="layer bottom-bg">
     < img src="https://Asamoisnailong.github.io/qianmo/1_1793846194156_mud1r.jpg" alt="底图">
     <div class="bg-particle-overlay"></div>
   </div>
-  <div class="layer snow-far" data-depth="0.4"></div>
-  <div class="layer top-img-wrapper" data-depth="1.0">
+  <div class="layer snow-far"></div>
+  <div class="layer top-img-wrapper">
     < img src="https://Asamoisnailong.github.io/qianmo/4_1793849874904_k8i1n.png" alt="图一">
     <svg class="red-thread-main" viewBox="0 0 522 521" xmlns="http://www.w3.org/2000/svg">
       <path id="mainThreadPath" d="" stroke="#d64040" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
     </svg>
   </div>
-  <div class="layer corner-wrapper" data-depth="0.35">
+  <div class="layer corner-wrapper">
     < img src="https://Asamoisnailong.github.io/qianmo/1793895849894_1793895937880_dpsr5.png" alt="右下角装饰">
     <svg class="red-thread-corner" viewBox="0 0 264 263" xmlns="http://www.w3.org/2000/svg">
       <path id="cornerThreadPath" d="" stroke="#d64040" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
     </svg>
   </div>
-  <div class="layer snow-near" data-depth="1.8"></div>
-  <div class="layer text-block" data-depth="0.6">
+  <div class="layer snow-near"></div>
+  <div class="layer text-block">
     <p>The bird wishes it were a cloud.</p >
     <p>The cloud wishes it were a bird.</p >
     <svg class="wrap-thread" viewBox="0 0 1018 161" xmlns="http://www.w3.org/2000/svg">
@@ -249,6 +244,7 @@
 </div>
 
 <script>
+  // 纯粹只负责缩放适配
   const container = document.getElementById('container');
   const BASE_W = 964;
   const BASE_H = 644;
@@ -264,51 +260,21 @@
   doResize();
   window.addEventListener('resize', doResize);
 
-  const layers = [...document.querySelectorAll('.layer')];
-  let targetX = 0, targetY = 0;
-  let curX = 0, curY = 0;
-
-  function onMove(clientX, clientY) {
-    const rect = container.getBoundingClientRect();
-    const scaleVal = parseFloat(container.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1);
-    const rawX = (clientX - rect.left) / scaleVal;
-    const rawY = (clientY - rect.top) / scaleVal;
-    const cx = BASE_W / 2;
-    const cy = BASE_H / 2;
-    targetX = (rawX - cx) / (BASE_W / 2);
-    targetY = (rawY - cy) / (BASE_H / 2);
-  }
-
-  // ★ 只保留电脑鼠标的跟随
-  container.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
-  
-  // ★ 删除了 touchmove 里的视差和拦截，手机端滑动不再抽搐！
-  
-  container.addEventListener('mouseleave', () => { targetX = 0; targetY = 0; });
-
+  // 只有红绳的自动游走动画，没有任何鼠标/手指事件
   const mainThread = document.getElementById('mainThreadPath');
   const mw = 524, mh = 523;
   let angleMain = 0;
+
   const cornerThread = document.getElementById('cornerThreadPath');
   const cw = 266, ch = 265;
   let angleCorner = 0;
+
   const wrapPath = document.getElementById('wrapPath');
   const ww = 1022;
   let phaseWrap = 0;
 
   function mainLoop() {
-    curX += (targetX - curX) * 0.014;
-    curY += (targetY - curY) * 0.013;
-    curX = Math.max(-1, Math.min(1, curX));
-    curY = Math.max(-1, Math.min(1, curY));
-
-    layers.forEach(layer => {
-      const depth = parseFloat(layer.dataset.depth || '1');
-      const px = -curX * depth * 28;
-      const py = -curY * depth * 28;
-      layer.style.transform = `translate3d(${px}px, ${py}px, 0)`;
-    });
-
+    // 图一 S型红线
     angleMain += 0.023;
     const pts1 = [];
     for (let i = 0; i <= 200; i++) {
@@ -323,6 +289,7 @@
     }
     mainThread.setAttribute('d', `M${pts1.join(' L')}`);
 
+    // 右下角 S型红线
     angleCorner += 0.034;
     const pts2 = [];
     for (let i = 0; i <= 130; i++) {
@@ -337,6 +304,7 @@
     }
     cornerThread.setAttribute('d', `M${pts2.join(' L')}`);
 
+    // 文字缠绕红绳
     phaseWrap += 0.036;
     const pts3 = [];
     for (let i = 0; i <= 460; i++) {
@@ -355,78 +323,6 @@
     requestAnimationFrame(mainLoop);
   }
   mainLoop();
-
-  // ========== 点击迸发效果（只保留点击，且加了防误触） ==========
-  let lastBurstTime = 0;
-
-  container.addEventListener('click', function(e) {
-    const rect = container.getBoundingClientRect();
-    const scaleVal = parseFloat(container.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1);
-    const rawX = (e.clientX - rect.left) / scaleVal;
-    const rawY = (e.clientY - rect.top) / scaleVal;
-    burstSnow(rawX, rawY);
-  });
-
-  container.addEventListener('touchstart', function(e) {
-    if (e.touches.length === 1) {
-      const rect = container.getBoundingClientRect();
-      const scaleVal = parseFloat(container.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1);
-      const rawX = (e.touches[0].clientX - rect.left) / scaleVal;
-      const rawY = (e.touches[0].clientY - rect.top) / scaleVal;
-      burstSnow(rawX, rawY);
-    }
-  }, { passive: true });
-
-  function burstSnow(cx, cy) {
-    const now = Date.now();
-    if (now - lastBurstTime < 200) return;
-    lastBurstTime = now;
-
-    const count = 40;
-    const fragment = document.createDocumentFragment();
-    for (let i = 0; i < count; i++) {
-      const el = document.createElement('div');
-      el.className = 'burst-snow';
-      const size = 2 + Math.random() * 3.5;
-      el.style.cssText = `position: absolute; width: ${size}px; height: ${size}px; background: rgba(255,255,255,${0.7 + Math.random() * 0.3}); border-radius: 50%; pointer-events: none; left: ${cx}px; top: ${cy}px; will-change: transform, opacity;`;
-      fragment.appendChild(el);
-    }
-    container.appendChild(fragment);
-
-    const particles = container.querySelectorAll('.burst-snow');
-    const params = [];
-    particles.forEach((el) => {
-      const angle = Math.random() * 2 * Math.PI;
-      const radius = 60 + Math.random() * 100;
-      const vx = Math.cos(angle) * radius;
-      const vy = Math.sin(angle) * radius - 15;
-      const rot = Math.random() * 540 - 270;
-      const duration = 600 + Math.random() * 470;
-      const startTime = performance.now();
-      params.push({ el, vx, vy, rot, duration, startTime });
-    });
-
-    function animateBurst(time) {
-      let alive = false;
-      params.forEach(p => {
-        const elapsed = time - p.startTime;
-        const progress = Math.min(elapsed / p.duration, 1);
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        const tx = p.vx * easeOut;
-        const ty = p.vy * easeOut + 25 * easeOut * easeOut;
-        const scaleP = 1 - 0.5 * easeOut;
-        const opacity = 1 - easeOut;
-        p.el.style.transform = `translate(${tx}px, ${ty}px) rotate(${p.rot * easeOut}deg) scale(${scaleP})`;
-        p.el.style.opacity = opacity;
-        if (progress < 1) alive = true;
-      });
-      if (alive) requestAnimationFrame(animateBurst);
-      else {
-        document.querySelectorAll('.burst-snow').forEach(el => el.remove());
-      }
-    }
-    requestAnimationFrame(animateBurst);
-  }
 </script>
 </body>
 </html>
