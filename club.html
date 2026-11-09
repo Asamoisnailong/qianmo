@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>校园墙 · 社团招新</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #fce4ec 0%, #e8eaf6 50%, #e0f7fa 100%);
+    padding: 40px 20px;
+  }
+
+  /* 顶部标题 */
+  .wall-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .wall-header h1 {
+    font-size: 2.4rem;
+    color: #4a148c;
+    text-shadow: 2px 2px 0 #fff;
+    letter-spacing: 4px;
+  }
+  .wall-header p {
+    margin-top: 8px;
+    color: #6a1b9a;
+    font-size: 1rem;
+  }
+
+  /* 卡片墙网格 */
+  .wall {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 28px;
+  }
+
+  /* 单张卡片 */
+  .card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0,0,0,.15);
+    transition: transform .3s ease, box-shadow .3s ease;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+  }
+  .card:hover {
+    transform: translateY(-8px) rotate(1deg);
+    box-shadow: 0 20px 40px rgba(0,0,0,.25);
+  }
+
+  /* 卡片图片区域 */
+  .card-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* 卡片内容区域 */
+  .card-body {
+    padding: 22px 24px 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  /* 背景主题 - 内容区 */
+  .card.baseball .card-body { background: linear-gradient(135deg,#43a047,#66bb6a); }
+  .card.literature .card-body { background: linear-gradient(135deg,#6d4c41,#8d6e63); }
+  .card.photo .card-body { background: linear-gradient(135deg,#1565c0,#42a5f5); }
+  .card.garden .card-body { background: linear-gradient(135deg,#c2185b,#f06292); }
+  .card.drama .card-body { background: linear-gradient(135deg,#d84315,#ff7043); }
+  .card.magic .card-body { background: linear-gradient(135deg,#7b1fa2,#ce93d8); }
+
+  /* 装饰圆 */
+  .card-body::before {
+    content: "";
+    position: absolute;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.1);
+    top: -40px; right: -30px;
+  }
+  .card-body::after {
+    content: "";
+    position: absolute;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+    bottom: -25px; left: -25px;
+  }
+
+  .card-body h2 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 10px;
+    z-index: 1;
+    position: relative;
+  }
+  .card-body p {
+    font-size: .92rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,.95);
+    z-index: 1;
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  /* 成员信息 */
+  .members {
+    z-index: 1;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .members .m-title {
+    font-size: .82rem;
+    color: rgba(255,255,255,.75);
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+  .members .m-list {
+    font-size: .95rem;
+    color: #fff;
+    line-height: 1.8;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+  .members .m-item {
+    background: rgba(255,255,255,.18);
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: .88rem;
+  }
+  .members .m-item.president {
+    background: rgba(255,255,255,.35);
+    font-weight: 600;
+  }
+  .card .btn {
+    align-self: flex-start;
+    background: rgba(255,255,255,.25);
+    border: 1px solid rgba(255,255,255,.6);
+    color: #fff;
+    padding: 8px 22px;
+    border-radius: 30px;
+    font-size: .9rem;
+    cursor: pointer;
+    z-index: 1;
+    position: relative;
+    transition: background .3s;
+  }
+  .card .btn:hover { background: rgba(255,255,255,.5); }
+
+  /* 底部 */
+  .wall-footer {
+    text-align: center;
+    margin-top: 40px;
+    color: #6a1b9a;
+    font-size: .9rem;
+  }
+
+  @media (max-width: 600px) {
+    .wall-header h1 { font-size: 1.8rem; }
+    .card-img { height: 160px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="wall-header">
+    <h1>🏫 校园招新墙</h1>
+    <p>— 新学期 · 新社团 · 新朋友，快来加入我们吧 —</p>
+  </div>
+
+  <div class="wall">
+
+    <!-- 棒球社 -->
+    <div class="card baseball">
+      <img class="card-img" src="https://Asamoisnailong.github.io/qianmo/89BC8DD7F104E19FBFA42E4190190004_1794054585456_xuh37.jpg" alt="棒球社">
+      <div class="card-body">
+        <div>
+          <h2>⚾ 棒球社</h2>
+          <p>挥棒击出梦想，跑垒追逐青春！无论你是新手还是高手，这里都有属于你的位置，一起享受热血与团队协作的快乐。</p>
+          <div class="members">
+            <div class="m-title">🏅 社长</div>
+            <div class="m-list">
+              <span class="m-item president">星</span>
+              <span class="m-item president">穹</span>
+            </div>
+          </div>
+          <div class="members">
+            <div class="m-title">👥 主要成员</div>
+            <div class="m-list">
+              <span class="m-item">散兵</span>
+              <span class="m-item">故凝</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn">立即报名 →</button>
+      </div>
+    </div>
+
+    <!-- 文学社 -->
+    <div class="card literature">
+      <img class="card-img" src="https://Asamoisnailong.github.io/qianmo/7AF333846BBDC2D231DEA9DACBFFDF4A_1794054596501_vznoi.jpg" alt="文学社">
+      <div class="card-body">
+        <div>
+          <h2>📖 文学社</h2>
+          <p>以笔为舟，以墨为帆。写诗、读文、共赏好书，在文字的世界里寻找共鸣，记录属于你的故事。</p>
+          <div class="members">
+            <div class="m-title">🏅 社长</div>
+            <div class="m-list">
+              <span class="m-item president">丹恒</span>
+            </div>
+          </div>
+          <div class="members">
+            <div class="m-title">👥 主要成员</div>
+            <div class="m-list">
+              <span class="m-item">法兰西</span>
+              <span class="m-item">荧</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn">立即报名 →</button>
+      </div>
+    </div>
+
+    <!-- 摄影社 -->
+    <div class="card photo">
+      <img class="card-img" src="https://Asamoisnailong.github.io/qianmo/593A9401ABE5B37CC867CA7FD9BCB680_1794054609368_cimll.jpg" alt="摄影社">
+      <div class="card-body">
+        <div>
+          <h2>📷 摄影社</h2>
+          <p>用镜头定格校园的每一帧美好。外拍、修图、作品分享，一起发现光影之美，记录独一无二的青春瞬间。</p>
+          <div class="members">
+            <div class="m-title">🏅 社长</div>
+            <div class="m-list">
+              <span class="m-item president">三月七</span>
+            </div>
+          </div>
+          <div class="members">
+            <div class="m-title">👑 副社长</div>
+            <div class="m-list">
+              <span class="m-item president">长夜月</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn">立即报名 →</button>
+      </div>
+    </div>
+
+    <!-- 园艺社 -->
+    <div class="card garden">
+      <img class="card-img" src="https://Asamoisnailong.github.io/qianmo/152A0C2B02A951084F3EB6FCD6272A92_1794054602985_l6dn5.jpg" alt="园艺社">
+      <div class="card-body">
+        <div>
+          <h2>🌿 园艺社</h2>
+          <p>播种花草，感受自然的治愈。一起打理校园绿植，体验种植与收获的满满成就感。</p>
+          <div class="members">
+            <div class="m-title">🏅 社长</div>
+            <div class="m-list">
+              <span class="m-item president">忆夏</span>
+            </div>
+          </div>
+          <div class="members">
+            <div class="m-title">👥 主要成员</div>
+            <div class="m-list">
+              <span class="m-item">杜林</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn">立即报名 →</button>
+      </div>
+    </div>
+
+    <!-- 戏剧社 -->
+    <div class="card drama">
+      <img class="card-img" src="https://Asamoisnailong.github.io/qianmo/OIP-C_1794056206047_q7qkq.webp" alt="戏剧社">
+      <div class="card-body">
+        <div>
+          <h2>🎭 戏剧社</h2>
+          <p>登台表演，释放表达的魅力。剧本创作、角色演绎、舞台灯光，在这里绽放属于你的光芒！</p>
+          <div class="members">
+            <div class="m-title">🏅 社长</div>
+            <div class="m-list">
+              <span class="m-item president">花火</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn">立即报名 →</button>
+      </div>
+    </div>
+
+    <!-- 魔法奶龙社 -->
+    <div class="card magic">
+      <img class="card-img" src="https://Asamoisnailong.github.io/qianmo/F4759FA22A9FDF34803791DC0EBE4165_1794054615947_o7b2s.jpg" alt="魔法奶龙社">
+      <div class="card-body">
+        <div>
+          <h2>🐉✨ 魔法奶龙社</h2>
+          <p>这是最魔法的社团！奶龙爱好者聚集地，欢乐、创意、脑洞无限，一起来施展属于青春的魔法吧～</p>
+          <div class="members">
+            <div class="m-title">🏅 社长</div>
+            <div class="m-list">
+              <span class="m-item president">浅漠</span>
+            </div>
+          </div>
+          <div class="members">
+            <div class="m-title">👑 副社长</div>
+            <div class="m-list">
+              <span class="m-item president">安柒</span>
+              <span class="m-item president">阿喜</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn">立即报名 →</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="wall-footer">
+    📌 扫码或点击卡片即可报名 · 招新时间：9月1日—9月15日
+  </div>
+
+</body>
+</html>
