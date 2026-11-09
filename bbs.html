@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今日校园 · 校园论坛 | CAMPUS BBS</title>
+<style>
+:root{
+  --bg:#f2f3f5; --panel:#ffffff; --line:#eaecef; --line-2:#f0f1f3;
+  --text:#0f1419; --text-2:#576574; --text-3:#8a96a3;
+  --brand:#f53b4d; --brand-soft:#fff0f1;
+  --blue:#1d9bf0; --orange:#ff8a00; --purple:#7c5cff; --green:#12b886;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 2px 12px rgba(20,25,35,.07);
+  --shadow-lg:0 8px 30px rgba(20,25,35,.12);
+  --r:14px; --r-sm:10px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input{font-family:inherit}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#cfd6de;border-radius:8px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* 顶部 */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1180px;margin:0 auto;height:56px;display:flex;align-items:center;gap:14px;padding:0 16px}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#ff7a5c,#f53b4d);display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px;box-shadow:0 3px 8px rgba(245,59,77,.3)}
+.logo-text{display:flex;flex-direction:column;line-height:1.15}
+.logo-text b{font-size:15px;letter-spacing:.5px}
+.logo-text span{font-size:10px;color:var(--text-3);letter-spacing:1px;text-transform:uppercase}
+.search{flex:1;max-width:420px;height:34px;margin-left:auto;background:#f0f2f5;border-radius:20px;display:flex;align-items:center;gap:8px;padding:0 14px}
+.search svg{flex-shrink:0;opacity:.5}
+.search input{border:none;outline:none;background:none;flex:1;font-size:13.5px;color:var(--text)}
+.search input::placeholder{color:var(--text-3)}
+.top-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.btn-pill{height:32px;padding:0 14px;border-radius:20px;font-size:13.5px;font-weight:600;background:#f0f2f5;color:var(--text-2);display:inline-flex;align-items:center;gap:5px;transition:.18s}
+.btn-pill:hover{background:#e6e9ed;color:var(--text)}
+.btn-brand{background:var(--brand);color:#fff}
+.btn-brand:hover{background:#e22d3f;color:#fff}
+.avatar-mini{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#5b8cff,#c66bff);display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff}
+
+/* 布局 */
+.layout{max-width:1180px;margin:0 auto;padding:16px;display:grid;grid-template-columns:200px minmax(0,1fr) 300px;gap:16px;align-items:start}
+.left,.right{position:sticky;top:72px;max-height:calc(100vh - 88px);overflow:auto}
+.left::-webkit-scrollbar,.right::-webkit-scrollbar{display:none}
+
+/* 侧边导航 */
+.side-nav{background:var(--panel);border-radius:var(--r);padding:8px;box-shadow:var(--shadow-sm);border:1px solid var(--line-2)}
+.nav-item{display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border-radius:10px;font-size:14.5px;color:var(--text-2);transition:.16s;text-align:left}
+.nav-item:hover{background:#f5f7f9;color:var(--text)}
+.nav-item .ico{width:20px;height:20px;flex-shrink:0;opacity:.75}
+.nav-item .badge{margin-left:auto;font-size:11px;background:var(--brand);color:#fff;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 5px;font-weight:700}
+.nav-item.on{background:var(--brand-soft);color:var(--brand);font-weight:700}
+.nav-item.on .ico{opacity:1}
+.nav-divider{height:1px;background:var(--line-2);margin:8px 6px}
+
+/* tabs / sort */
+.tabs-wrap{background:var(--panel);border-radius:var(--r);padding:4px;box-shadow:var(--shadow-sm);border:1px solid var(--line-2);margin-bottom:12px;overflow:auto}
+.tabs{display:flex;gap:4px}
+.tab{flex-shrink:0;padding:9px 16px;border-radius:9px;font-size:14px;color:var(--text-2);font-weight:500;transition:.16s;white-space:nowrap}
+.tab:hover{background:#f5f7f9}
+.tab.on{background:var(--text);color:#fff;font-weight:600}
+.sortbar{display:flex;align-items:center;gap:6px;padding:0 2px 10px}
+.sortbar .label{font-size:13px;color:var(--text-3);margin-right:auto}
+.chip{font-size:12.5px;color:var(--text-2);padding:5px 11px;border-radius:20px;background:#fff;border:1px solid var(--line);transition:.16s}
+.chip:hover{border-color:#c9d2da;color:var(--text)}
+.chip.on{background:var(--text);color:#fff;border-color:var(--text)}
+
+/* 帖子卡片 */
+.feed{display:flex;flex-direction:column;gap:10px}
+.post{background:var(--panel);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow-sm);border:1px solid var(--line-2);transition:box-shadow .18s,border-color .18s,transform .18s}
+.post:hover{box-shadow:var(--shadow-md);border-color:#dfe3e8}
+.head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ava{width:42px;height:42px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:16px;font-weight:700;color:#fff;position:relative;cursor:pointer;overflow:hidden;background-size:cover;background-position:center}
+.ava>img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%}
+.ava.sm{width:34px;height:34px;font-size:13px}
+.ava.xs{width:28px;height:28px;font-size:11px}
+.ava.online::after{content:"";position:absolute;right:-1px;bottom:-1px;width:11px;height:11px;background:#1ec96d;border:2px solid #fff;border-radius:50%}
+.names{min-width:0;flex:1}
+.names .top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.uname{font-size:14.5px;font-weight:700;cursor:pointer}
+.uname:hover{color:var(--blue);text-decoration:underline}
+.tag-v{width:15px;height:15px;border-radius:50%;background:var(--blue);display:grid;place-items:center;flex-shrink:0}
+.uname.sub{font-weight:600;color:var(--text-2)}
+.meta{font-size:12px;color:var(--text-3);margin-top:1px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.dot-sep{opacity:.6}
+.time-hot{display:flex;align-items:center;gap:5px}
+.time-hot.hot{color:var(--brand);font-weight:700}
+.time-hot svg{opacity:.9}
+.more-btn{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;color:var(--text-3);transition:.16s}
+.more-btn:hover{background:#f2f4f6;color:var(--text)}
+
+.board-tag{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;padding:2px 8px;border-radius:6px;font-weight:600;line-height:1.6}
+.board-tag.obs{background:#eaf4ff;color:#2b7de9}
+.board-tag.fun{background:#fff4e6;color:#e8892b}
+.board-tag.anon{background:#f2f3f7;color:#6b7280}
+.board-tag.recruit{background:#eafaf3;color:#0ea472}
+.board-tag.daily{background:#eef9f0;color:#3aa76d}
+.board-tag.hot{background:#fff0f1;color:var(--brand)}
+.board-tag.eye{background:#f0ecff;color:#6b4dff}
+
+.p-body{cursor:pointer}
+.p-title{font-size:16.5px;font-weight:800;line-height:1.5;margin:0 0 8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.p-title .kw{color:var(--brand)}
+.p-text{font-size:15px;line-height:1.75;color:#1c2128;margin:0 0 10px;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.p-text.full{display:block;-webkit-line-clamp:unset}
+.p-media{display:grid;gap:3px;border-radius:var(--r-sm);overflow:hidden;margin-bottom:10px}
+.p-media.count-1{grid-template-columns:1fr}
+.p-media.count-2{grid-template-columns:1fr 1fr}
+.p-media.count-3{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.p-media.count-3 .ph:first-child{grid-row:span 2}
+.p-media.count-4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.ph{position:relative;min-height:150px;background:#eef1f4;display:grid;place-items:center;color:rgba(255,255,255,.92);font-size:12px}
+.ph.hero{min-height:210px}
+.ph::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.28))}
+.ph .cap{position:absolute;left:10px;bottom:9px;font-size:12px;z-index:2;text-shadow:0 1px 3px rgba(0,0,0,.4);font-weight:500}
+.ph .icon-big{font-size:38px;z-index:2;opacity:.92;text-shadow:0 2px 6px rgba(0,0,0,.18)}
+.ph .cap.r{right:10px;left:auto}
+.poll{border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:10px;background:#fcfdfe}
+.poll-q{font-size:14.5px;font-weight:700;margin-bottom:10px}
+.poll-opt{position:relative;margin-bottom:8px;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13.5px;overflow:hidden}
+.poll-opt:last-child{margin-bottom:0}
+.poll-bar{position:absolute;left:0;top:0;bottom:0;background:var(--brand-soft);z-index:0;border-radius:8px}
+.poll-opt span{position:relative;z-index:1}
+.poll-opt b{position:relative;z-index:1;float:right;color:var(--brand);font-size:12.5px}
+.poll-foot{font-size:12px;color:var(--text-3);margin-top:8px}
+
+/* 互动条 */
+.actbar{display:flex;align-items:center;margin-top:2px;padding-top:8px;border-top:1px solid var(--line-2)}
+.act{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:34px;border-radius:8px;font-size:13px;color:var(--text-2);transition:.15s}
+.act:hover{background:#f2f4f6}
+.act:hover .a-ico{transform:scale(1.12)}
+.act.like:hover .a-ico{color:var(--brand)}
+.act.like.on{color:var(--brand)}
+.act.like.on .a-ico{color:var(--brand)}
+.act.com:hover .a-ico{color:#12b886}
+.act.rep:hover .a-ico{color:var(--purple)}
+.a-ico{width:18px;height:18px;display:grid;place-items:center;transition:.15s}
+.a-ico svg{width:100%;height:100%}
+.act .num{min-width:8px;text-align:left}
+
+/* 评论预览 */
+.c-prev{margin-top:10px;background:#f7f8fa;border-radius:var(--r-sm);padding:10px 12px}
+.c-prev-h{font-size:12.5px;color:var(--text-3);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.c-line{display:flex;gap:9px;padding:5px 0;font-size:13.5px;line-height:1.55}
+.c-line .ct{min-width:0;flex:1}
+.c-line .cn{font-weight:700;font-size:13px}
+.c-line .cn.sub{color:var(--text-2)}
+.c-line .cn.tag{color:var(--brand);font-size:11.5px;font-weight:600;margin-left:4px}
+.c-line .cx{color:var(--text-2);font-size:12.5px}
+.c-more{margin-top:6px;font-size:13px;color:var(--text-2);font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.c-more:hover{color:var(--blue)}
+
+/* 右侧栏 */
+.widget{background:var(--panel);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow-sm);border:1px solid var(--line-2);margin-bottom:12px}
+.w-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.w-head b{font-size:15px}
+.w-head a{font-size:12.5px;color:var(--text-3)}
+.w-head a:hover{color:var(--blue)}
+.hot-list{display:flex;flex-direction:column}
+.hot-item{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line-2);cursor:pointer}
+.hot-item:last-child{border-bottom:none}
+.hot-rank{width:20px;height:20px;flex-shrink:0;border-radius:5px;background:#f2f4f6;color:var(--text-2);font-size:12px;font-weight:800;display:grid;place-items:center;margin-top:2px}
+.hot-rank.top3{background:var(--brand);color:#fff}
+.hot-ct{min-width:0;flex:1}
+.hot-ct b{font-size:13.5px;line-height:1.45;display:block}
+.hot-ct span{font-size:11.5px;color:var(--text-3);display:flex;align-items:center;gap:8px;margin-top:3px}
+.member-list{display:flex;flex-direction:column;gap:2px}
+.member{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;cursor:pointer;transition:.15s}
+.member:hover{background:#f5f7f9}
+.member .ava{width:38px;height:38px;font-size:14px}
+.member .mi{min-width:0;flex:1}
+.member .mi b{font-size:13.5px;display:block}
+.member .mi span{font-size:11.5px;color:var(--text-3)}
+.member .follow{font-size:12.5px;font-weight:700;color:var(--brand);border:1px solid var(--brand);border-radius:16px;padding:3px 12px;transition:.15s;flex-shrink:0}
+.member .follow.on{color:var(--text-3);border-color:var(--line)}
+.member .follow:not(.on):hover{background:var(--brand);color:#fff}
+.notice{font-size:12.5px;color:var(--text-2);line-height:1.8}
+.notice b{color:var(--text)}
+.tip{font-size:11.5px;color:var(--text-3);line-height:1.7;background:#f7f8fa;border-radius:10px;padding:10px 12px}
+
+/* 详情页 */
+.detail-scroll{position:fixed;inset:0;background:var(--bg);z-index:100;overflow-y:auto;display:none;animation:slideIn .24s ease}
+.detail-scroll.show{display:block}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.detail-nav{position:sticky;top:0;z-index:5;height:52px;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 16px;max-width:780px;margin:0 auto}
+.back-btn{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#f2f4f6;transition:.15s}
+.back-btn:hover{background:#e6e9ed}
+.detail-nav .title{font-size:15.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.detail-wrap{max-width:780px;margin:0 auto;padding:14px 16px 60px}
+.detail-post{background:var(--panel);border-radius:var(--r);padding:18px 20px 4px;box-shadow:var(--shadow-sm);border:1px solid var(--line-2)}
+.detail-post .p-title{font-size:19px;-webkit-line-clamp:unset}
+.detail-post .p-text{font-size:15.5px;-webkit-line-clamp:unset;white-space:pre-wrap}
+.detail-act{display:flex;align-items:center;gap:18px;padding:14px 0;border-top:1px solid var(--line-2);margin-top:14px;font-size:13.5px;color:var(--text-2)}
+.detail-act .act{flex:none;height:auto}
+.com-editor{display:flex;gap:12px;padding:16px 0;border-top:1px solid var(--line-2);margin-top:6px}
+.com-editor textarea{flex:1;min-height:60px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14.5px;resize:vertical;outline:none;font-family:inherit;transition:.18s;background:#fafbfc}
+.com-editor textarea:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(29,155,240,.1)}
+.com-editor .send{align-self:flex-end;height:38px;padding:0 20px;border-radius:20px;background:var(--brand);color:#fff;font-size:14px;font-weight:700;flex-shrink:0;transition:.15s}
+.com-editor .send:hover{background:#e22d3f}
+.com-list{margin-top:8px;background:var(--panel);border-radius:var(--r);padding:4px 20px 20px;box-shadow:var(--shadow-sm);border:1px solid var(--line-2)}
+.com-list-h{position:sticky;top:52px;z-index:4;background:var(--panel);padding:14px 0 10px;font-size:14px;font-weight:700;border-bottom:1px solid var(--line-2);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.com-list-h span{font-size:12.5px;color:var(--text-3);font-weight:500}
+.sort-com{margin-left:auto;font-size:12.5px;color:var(--text-3);display:flex;gap:12px}
+.sort-com a.on{color:var(--text);font-weight:600}
+.com-item{padding:14px 0;border-bottom:1px solid var(--line-2)}
+.com-item:last-child{border-bottom:none}
+.com-head{display:flex;align-items:flex-start;gap:10px}
+.com-head .ava{width:38px;height:38px;font-size:14px}
+.com-main{min-width:0;flex:1}
+.com-top{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.com-top .uname{font-size:14px}
+.floor{font-size:11.5px;color:var(--text-3);margin-left:auto}
+.com-time{font-size:12px;color:var(--text-3);margin-top:1px}
+.com-body{font-size:14.5px;line-height:1.75;margin:6px 0 8px;white-space:pre-wrap;word-break:break-word}
+.com-acts{display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--text-3)}
+.com-acts a{cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.com-acts a:hover{color:var(--text)}
+.com-acts a.liked{color:var(--brand)}
+.thread{margin-top:10px;background:#f7f8fa;border-radius:12px;padding:4px 14px 10px;border:1px solid var(--line-2)}
+.thread-item{display:flex;gap:9px;padding:9px 0;border-bottom:1px dashed var(--line-2);font-size:13.5px;line-height:1.6}
+.thread-item:last-child{border-bottom:none}
+.thread-item .ava{width:28px;height:28px;font-size:11px}
+.thread-ct{min-width:0;flex:1}
+.thread-ct .cn{font-weight:700;font-size:13px;cursor:pointer}
+.thread-ct .cn:hover{color:var(--blue)}
+.thread-ct .cn.op{color:var(--brand)}
+.thread-ct .cn.rep{color:var(--text-3);font-weight:500}
+.thread-ct .tx{color:#1c2128;white-space:pre-wrap;word-break:break-word}
+.thread-ct .ft{font-size:11.5px;color:var(--text-3);margin-top:3px;display:flex;gap:12px}
+.thread-ct .ft a{cursor:pointer}
+.thread-ct .ft a:hover{color:var(--brand)}
+.thread-more{font-size:12.5px;color:var(--text-2);font-weight:600;padding:8px 0 4px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.thread-more:hover{color:var(--blue)}
+.thread-reply{display:none;margin-top:10px;gap:10px;align-items:flex-start}
+.thread-reply.show{display:flex}
+.thread-reply input{flex:1;border:1px solid var(--line);border-radius:20px;padding:7px 14px;font-size:13px;outline:none;background:#fff;transition:.15s}
+.thread-reply input:focus{border-color:var(--blue)}
+.thread-reply button{font-size:13px;font-weight:700;color:var(--brand);padding:7px 14px;flex-shrink:0;transition:.15s}
+.thread-reply button:hover{opacity:.8}
+.empty-thread{font-size:12.5px;color:var(--text-3);padding:6px 0 2px}
+.thread-page{font-size:12px;color:var(--text-3);padding-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+.thread-page a{cursor:pointer;min-width:22px;height:22px;padding:0 5px;border-radius:5px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;transition:.15s}
+.thread-page a.on{background:var(--text);color:#fff;border-color:var(--text)}
+.thread-page a:hover:not(.on){border-color:#c9d2da}
+
+.fab{position:fixed;right:28px;bottom:34px;z-index:60;width:56px;height:56px;border-radius:50%;background:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(245,59,77,.4);display:grid;place-items:center;transition:.18s}
+.fab:hover{transform:scale(1.06);background:#e22d3f}
+.fab svg{width:24px;height:24px}
+.toast{position:fixed;left:50%;top:78px;transform:translate(-50%,-16px);z-index:200;background:rgba(15,20,25,.92);color:#fff;padding:10px 18px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:.22s;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:1080px){
+  .layout{grid-template-columns:64px minmax(0,1fr);gap:12px}
+  .nav-item span:not(.badge){display:none}
+  .nav-item{justify-content:center;padding:12px 0}
+  .nav-item .badge{display:none}
+  .right{display:none}
+}
+@media(max-width:720px){
+  .layout{grid-template-columns:minmax(0,1fr);padding:10px}
+  .left{display:none}
+  .search{display:none}
+  .detail-post{padding:14px 14px 4px}
+  .com-list{padding:4px 14px 20px}
+  .topbar-inner{padding:0 10px;gap:8px}
+  .btn-pill:not(.btn-brand){display:none}
+  .fab{right:16px;bottom:20px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="logo">
+      <div class="logo-mark">校</div>
+      <div class="logo-text"><b>今日校园</b><span>Campus BBS</span></div>
+    </div>
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input placeholder="搜索帖子、社团、楼主……">
+    </div>
+    <div class="top-actions">
+      <button class="btn-pill" onclick="toast('创作中心即将上线')">创作中心</button>
+      <button class="btn-pill" onclick="toast('通知：暂无新消息')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+      </button>
+      <div class="avatar-mini">我</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="left">
+    <nav class="side-nav" id="sideNav"></nav>
+    <div class="widget" style="margin-top:12px">
+      <div class="w-head"><b>本月活跃榜</b><a href="#" onclick="event.preventDefault();toast('完整榜单：魔法奶龙社社长 · 1,502 活跃值')">完整榜单 ›</a></div>
+      <div class="member-list" id="activeList"></div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="tabs-wrap"><div class="tabs" id="tabs"></div></div>
+    <div class="sortbar">
+      <span class="label">排序：</span>
+      <button class="chip on" data-sort="hot" onclick="setSort(this)">最热</button>
+      <button class="chip" data-sort="new" onclick="setSort(this)">最新</button>
+      <button class="chip" data-sort="rep" onclick="setSort(this)">最多回复</button>
+      <button class="chip" data-sort="view" onclick="setSort(this)">最高浏览</button>
+    </div>
+    <div class="feed" id="feed"></div>
+    <div id="feedEnd" style="text-align:center;color:var(--text-3);font-size:13px;padding:26px 0 10px"></div>
+  </main>
+
+  <aside class="right">
+    <div class="widget">
+      <div class="w-head"><b>🔥 校园热议榜</b><a href="#" onclick="event.preventDefault();renderHot();toast('已换一批热议')">换一换</a></div>
+      <div class="hot-list" id="hotList"></div>
+    </div>
+    <div class="widget">
+      <div class="w-head"><b>✨ 社团推荐</b><a href="#" onclick="event.preventDefault();toast('查看更多社团')">查看全部</a></div>
+      <div class="member-list" id="clubList"></div>
+    </div>
+    <div class="widget">
+      <div class="notice"><b>今日校园 · 学生交流区</b><br>发帖请遵守《校园网络文明公约》，匿名投稿不代表可以免除责任。</div>
+    </div>
+    <div class="widget tip">小提示：点击任意帖子可查看完整内容与楼中楼评论，点「↳」可逐条回复，评论支持翻页哦～</div>
+  </aside>
+</div>
+
+<button class="fab" onclick="toast('发帖功能为前端演示，点击无实际提交')" title="发帖">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4z"/></svg>
+</button>
+
+<div class="toast" id="toast"></div>
+
+<div class="detail-scroll" id="detail">
+  <div class="detail-nav">
+    <button class="back-btn" onclick="closeDetail()" title="返回">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <span class="title" id="dTitle">帖子详情</span>
+    <button class="more-btn" style="margin-left:auto" onclick="toast('更多操作：收藏 / 举报 / 屏蔽')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+    </button>
+  </div>
+  <div class="detail-wrap">
+    <article class="detail-post" id="dPost"></article>
+    <div class="com-list" id="dCom"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== 数据 ===================== */
+const BOARD = {obs:'社团观察',fun:'校园趣闻',anon:'匿名投稿',recruit:'社团招新',daily:'社团日常',hot:'校园热议',eye:'特别关注',tree:'校园树洞'};
+const NAV = [
+  {k:'all',t:'论坛首页',ico:'<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/>'},
+  {k:'obs',t:'社团观察',ico:'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',badge:'128'},
+  {k:'fun',t:'校园趣闻',ico:'<path d="M9.5 2A2.5 2.5 0 007 4.5v0A2.5 2.5 0 009.5 7"/><path d="M14.5 2A2.5 2.5 0 0012 4.5v0A2.5 2.5 0 0014.5 7"/><path d="M2 12s3 7 10 7 10-7 10-7"/>'},
+  {k:'anon',t:'匿名投稿',ico:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',badge:'99+'},
+  {k:'recruit',t:'社团招新',ico:'<path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/>'},
+  {k:'daily',t:'社团日常',ico:'<path d="M12 2l2.4 6.8L22 10l-5.5 4.7L18 22l-6-3.6L6 22l1.5-7.3L2 10l7.6-1.2z"/>'},
+  {k:'hot',t:'校园热议',ico:'<path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 0 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/>'},
+  {gap:1},
+  {k:'tree',t:'校园树洞',ico:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>'},
+  {k:'fav',t:'我的收藏',ico:'<path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>'},
+  {k:'his',t:'浏览记录',ico:'<path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 102.13-9.5L1 10"/>'}
+];
+const CLUBS = {
+  baseball:{n:'棒球社',c:'#e8453c'},literature:{n:'文学社',c:'#3a6ea5'},photo:{n:'摄影社',c:'#e8892b'},
+  garden:{n:'园艺社',c:'#3aa76d'},drama:{n:'戏剧社',c:'#9b51e0'},magic:{n:'魔法奶龙社',c:'#6b4dff'}
+};
+const USERS = {
+  star:{av:'https://Asamoisnailong.github.io/qianmo/%E6%98%9F_1794115926716_ebqow.jpg',n:'星',c:'#e8453c',t:'棒球社 社长',cert:1},
+  dome:{av:'https://Asamoisnailong.github.io/qianmo/%E7%A9%B9_1794115898318_r6ozh.jpg',n:'穹',c:'#4a90d9',t:'棒球社 社长',cert:1},
+  wanderer:{av:'https://Asamoisnailong.github.io/qianmo/%E6%95%A3_1794115912720_totjf.jpg',n:'散兵',c:'#7b6079',t:'棒球社 副社长',cert:0},
+  danheng:{av:'',n:'丹恒',c:'#3a6ea5',t:'文学社 社长',cert:1},
+  france:{av:'',n:'法兰西',c:'#d4a017',t:'文学社 副社长',cert:0},
+  march:{av:'https://Asamoisnailong.github.io/qianmo/%E4%B8%89%E6%9C%88%E4%B8%83_1794115906536_0pqvi.jpg',n:'三月七',c:'#e8892b',t:'摄影社 社长',cert:1},
+  longye:{av:'https://Asamoisnailong.github.io/qianmo/%E9%95%BF%E5%A4%9C%E6%9C%88_1794115933807_nup94.jpg',n:'长夜月',c:'#5b6ba5',t:'摄影社 副社长',cert:1},
+  kaedehara:{av:'',n:'忆夏',c:'#3aa76d',t:'园艺社 社长',cert:1},
+  durin:{av:'https://Asamoisnailong.github.io/qianmo/%E6%9D%9C%E6%9E%97_1794115866987_v7y5f.jpg',n:'杜林',c:'#7bbf6a',t:'园艺社 副社长',cert:0},
+  sparkle:{av:'https://Asamoisnailong.github.io/qianmo/%E8%8A%B1%E7%81%AB_1794115874055_kqppl.jpg',n:'花火',c:'#9b51e0',t:'戏剧社 社长',cert:1},
+  qianmo:{av:'https://Asamoisnailong.github.io/qianmo/%E6%B5%85%E6%BC%A0_1794115892337_g5xev.jpg',n:'浅漠',c:'#6b4dff',t:'魔法奶龙社 社长',cert:1},
+  aaxi:{av:'https://Asamoisnailong.github.io/qianmo/%E6%81%90%E9%BE%99_1794115880205_biysu.jpg',n:'阿喜',c:'#ff8fa3',t:'魔法奶龙社 副社长',cert:1},
+  anqi:{av:'https://Asamoisnailong.github.io/qianmo/%E5%AE%89%E6%9F%92_1794115858161_wlrhg.jpg',n:'安柒',c:'#4a4a6a',t:'魔法奶龙社 副社长',cert:1},
+  anon:{av:'',n:'匿名用户',c:'#aab4be',t:'匿名投稿',cert:0,sub:1}
+};
+
+function POSTS(){return[
+ {id:1,club:'baseball',board:'obs',tag:'obs',tagText:'社团观察',hot:1,replies:12,views:2481,time:'3小时前',
+  author:{u:'star',sub:'匿名投稿'},
+  title:'听说棒球社的社长是两个人？到底谁说了算啊？？',
+  body:'今天路过棒球社训练场，发现他们社长那一栏居然写了两个人。\n\n星 和 穹？\n\n所以这是双社长制度吗？还是说其中一个是挂名的？\n\n顺便问一下，棒球社平时训练真的很严格吗？我上次路过好像看见有人拿着球棒追着另一个人跑……',
+  media:[{bg:'linear-gradient(135deg,#e8453c,#ff8a5c)',cap:'棒球社训练场 · 摄于昨日课后',icon:'⚾'}],
+  comments:[
+   {u:'star',tx:'双社长！我负责提出计划，穹负责执行计划！',t:'2小时前',likes:88,
+    thread:[{u:'dome',tx:'纠正一下。通常是星负责提出计划，我负责阻止计划。',t:'2小时前',likes:142},{u:'star',tx:'你这是在质疑社长的权威！',t:'2小时前',likes:56},{u:'dome',tx:'我们是平级。',t:'1小时前',likes:210}]},
+   {u:'dome',tx:'今天的训练取消了，原因是某人把球打进了教学楼二楼的窗户。',t:'2小时前',likes:304,
+    thread:[{u:'star',tx:'那是意外！',t:'2小时前',likes:42},{u:'wanderer',tx:'已经第三次了。',t:'1小时前',likes:178},{u:'star',tx:'你这是在质疑社长的权威！',t:'1小时前',likes:31}]},
+   {u:'wanderer',tx:'建议先学会正常打球，再考虑社长的权威问题。',t:'1小时前',likes:196,
+    thread:[{u:'star',tx:'你不也是棒球社的吗！',t:'1小时前',likes:88},{u:'wanderer',tx:'所以我才有资格说。',t:'58分钟前',likes:243}]},
+   {u:'anon',tx:'所以到底是谁打的？',t:'52分钟前',likes:67,thread:[{u:'star',tx:'……下一题。',t:'40分钟前',likes:521}]}
+  ]},
+ {id:2,club:'literature',board:'obs',tag:'obs',tagText:'社团观察',hot:0,replies:18,views:1726,time:'5小时前',
+  author:{u:'anon',sub:'投稿人：匿名'},
+  title:'文学社社长是不是一天到晚都在图书馆？',
+  body:'最近总是在图书馆看见丹恒。\n\n有时候在整理书，有时候在写东西，有时候只是坐在那里看窗外。\n\n想问一下文学社到底是做什么的？真的会有人聚在一起讨论文学吗？\n\n还有，丹恒社长是不是不太喜欢别人打扰？',
+  media:[{bg:'linear-gradient(135deg,#3a6ea5,#7ba7d4)',cap:'图书馆三楼 · 文学区',icon:'📚'},{bg:'linear-gradient(135deg,#c9a86a,#e8d9b0)',cap:'《雪夜书简》借阅登记中',icon:'📖'},{bg:'linear-gradient(135deg,#5b6b7a,#a8b4be)',cap:'窗外 · 今天的云',icon:'🪟'}],
+  comments:[
+   {u:'danheng',tx:'文学社主要进行文学阅读、写作交流和资料整理。欢迎对这些内容感兴趣的人加入。',t:'4小时前',likes:132,
+    thread:[{u:'anon',tx:'社长回复得好正式……',t:'4小时前',likes:45},{u:'danheng',tx:'因为这是一个正常的问题。',t:'3小时前',likes:203}]},
+   {u:'anon',tx:'听说文学社有很多书？',t:'3小时前',likes:28,thread:[{u:'danheng',tx:'有。借阅需要登记，请勿折页、涂画或将书籍带离登记范围。',t:'3小时前',likes:156}]},
+   {u:'anon',tx:'如果不小心在书上画了一只小猫呢？',t:'3小时前',likes:94,
+    thread:[{u:'danheng',tx:'请不要。',t:'3小时前',likes:87},{u:'anon',tx:'如果是很可爱的小猫呢？',t:'2小时前',likes:112},{u:'danheng',tx:'……也不行。',t:'2小时前',likes:245}]},
+   {u:'france',tx:'我觉得偶尔在书页里夹一片花瓣也不错呀。',t:'2小时前',likes:176,thread:[{u:'danheng',tx:'书籍保存不适合夹入未经处理的植物。',t:'2小时前',likes:198}]},
+   {u:'anon',tx:'感觉丹恒社长会把图书馆当成家。',t:'1小时前',likes:63,thread:[{u:'danheng',tx:'图书馆确实是一个适合安静阅读的地方。',t:'1小时前',likes:144}]}
+  ]},
+ {id:3,club:'photo',board:'fun',tag:'fun',tagText:'校园趣闻',hot:1,replies:26,views:3892,time:'1小时前',
+  author:{u:'anon',sub:'匿名投稿'},
+  title:'三月七社长是不是有什么校园摄影计划？我已经连续三天被拍了！',
+  body:'救命。\n\n今天在操场、昨天在教学楼、前天在食堂，我都看见摄影社社长拿着相机。\n\n而且她好像特别喜欢抓拍别人。\n\n请问摄影社是在收集全校学生的黑历史吗？',
+  media:[{bg:'linear-gradient(135deg,#ff7a5c,#ffb84d)',cap:'操场 · 17:24',icon:'📸'},{bg:'linear-gradient(135deg,#5b8cff,#a06bff)',cap:'教学楼走廊 · 抓拍中',icon:'🎞️'},{bg:'linear-gradient(135deg,#3aa76d,#7bd4a8)',cap:'食堂窗口 · 打饭瞬间',icon:'🍜'},{bg:'linear-gradient(135deg,#e8892b,#ffc06b)',cap:'「校园日常记录计划」底片墙',icon:'🖼️'}],
+  comments:[
+   {u:'march',tx:'才不是啦！！这是校园日常记录计划！而且我拍得超好看的！',t:'52分钟前',likes:288,
+    thread:[{u:'anon',tx:'那为什么我的照片里嘴巴是张开的？',t:'50分钟前',likes:102},{u:'march',tx:'因为你当时在打哈欠嘛！',t:'49分钟前',likes:176},{u:'anon',tx:'……',t:'48分钟前',likes:88}]},
+   {u:'longye',tx:'她昨天还拍了我睡觉的照片。',t:'48分钟前',likes:221,
+    thread:[{u:'march',tx:'那张真的很好看！！',t:'47分钟前',likes:154},{u:'longye',tx:'我醒来之后看见了自己的睡颜。',t:'46分钟前',likes:198},{u:'march',tx:'你应该感谢我！这可是珍贵影像！',t:'45分钟前',likes:167}]},
+   {u:'anon',tx:'长夜月副社长不管管她吗？',t:'44分钟前',likes:76,
+    thread:[{u:'longye',tx:'管过。没用。',t:'43分钟前',likes:312},{u:'march',tx:'喂！！',t:'42分钟前',likes:134}]},
+   {u:'anon',tx:'所以摄影社到底有什么要求？',t:'40分钟前',likes:52,
+    thread:[{u:'march',tx:'喜欢拍照就可以！不管你用什么设备，都欢迎加入！',t:'39分钟前',likes:143},{u:'longye',tx:'另外，拍摄他人请先征得同意。',t:'39分钟前',likes:266},{u:'march',tx:'知道啦知道啦！',t:'38分钟前',likes:98}]}
+  ]},
+ {id:4,club:'garden',board:'daily',tag:'daily',tagText:'社团日常',hot:0,replies:15,views:1204,time:'昨天',
+  author:{u:'anon',sub:'匿名用户'},
+  title:'园艺社养的植物是不是有点太好了？',
+  body:'最近经过园艺社，发现他们养的植物长势特别好。\n\n而且每一盆都有自己的名字。\n\n我还看见社长在对着一盆植物说话。\n\n请问园艺社有什么特别的养护技巧吗？',
+  media:[{bg:'linear-gradient(135deg,#3aa76d,#7bd4a8)',cap:'「小叶子」· 已陪伴 47 天',icon:'🌿'},{bg:'linear-gradient(135deg,#c9a86a,#e8d9b0)',cap:'「黄金小太阳」· 正在开花',icon:'🌼'}],
+  poll:{q:'你觉得给植物起名字有必要吗？',opts:[{t:'有必要，植物也是家人',v:68},{t:'没必要，浇水就行',v:24},{t:'我只起过一次，叫"别死"',v:8}],total:'1,284 人参与'},
+  comments:[
+   {u:'kaedehara',tx:'植物的生长需要耐心。比起急于看到结果，不如先学会观察它们的变化。',t:'昨天',likes:245,
+    thread:[{u:'anon',tx:'社长讲话好有诗意……',t:'昨天',likes:88},{u:'kaedehara',tx:'只是些日常心得罢了。',t:'昨天',likes:132}]},
+   {u:'durin',tx:'我觉得植物们都很可爱！尤其是刚刚冒出来的小芽！',t:'昨天',likes:198,
+    thread:[{u:'anon',tx:'杜林，你是不是又给植物浇水了？',t:'昨天',likes:76},{u:'durin',tx:'嗯！可是它们好像不需要那么多水……',t:'昨天',likes:143},{u:'kaedehara',tx:'所以我们今天学习了土壤湿度的判断。',t:'昨天',likes:211}]},
+   {u:'anon',tx:'社长，你们会养很奇怪的植物吗？',t:'昨天',likes:42,thread:[{u:'kaedehara',tx:'只要了解它们的习性，并且确保安全，便可以尝试。',t:'昨天',likes:128}]},
+   {u:'durin',tx:'我们下次想种一棵很大的树！',t:'昨天',likes:156,thread:[{u:'kaedehara',tx:'那就先从照顾好眼前的小苗开始吧。',t:'昨天',likes:267}]}
+  ]},
+ {id:5,club:'drama',board:'hot',tag:'hot',tagText:'校园热议',hot:1,replies:31,views:5617,time:'30分钟前',
+  author:{u:'anon',sub:'匿名投稿'},
+  title:'戏剧社招新是不是有隐藏条件？为什么社长看起来这么不靠谱？？？',
+  body:'今天去戏剧社问了一下招新。\n\n花火社长说，只要有表演欲望就可以加入。\n\n然后她让我抽了一张纸条。\n\n上面写着：\n\n「恭喜你，你已经被选中出演本年度校园悲剧的主角。」\n\n我还没报名啊？？？\n\n请问这是正常流程吗？',
+  media:[{bg:'linear-gradient(135deg,#9b51e0,#e0519a)',cap:'戏剧社活动室 · 招新现场',icon:'🎭'},{bg:'linear-gradient(135deg,#c9a86a,#e8c86a)',cap:'命运的纸条 · 上面写着你的角色',icon:'🎟️'}],
+  comments:[
+   {u:'sparkle',tx:'哎呀呀，被发现了？这可是命运的安排哦！',t:'25分钟前',likes:412,
+    thread:[{u:'anon',tx:'我可以拒绝吗？',t:'24分钟前',likes:132},{u:'sparkle',tx:'当然可以呀。不过你确定要放弃成为主角的机会吗？',t:'23分钟前',likes:356}]},
+   {u:'anon',tx:'戏剧社平时都干什么？',t:'22分钟前',likes:98,thread:[{u:'sparkle',tx:'排练、演出、编剧、舞台设计，还有一些有趣的小惊喜。',t:'21分钟前',likes:203}]},
+   {u:'anon',tx:'小惊喜是什么？',t:'20分钟前',likes:154,thread:[{u:'sparkle',tx:'这个嘛，等你加入就知道啦。',t:'19分钟前',likes:287}]},
+   {u:'anon',tx:'听说花火社长自己会写剧本？',t:'18分钟前',likes:67,thread:[{u:'sparkle',tx:'当然！不过有些结局可不一定是观众想看到的。',t:'17分钟前',likes:301}]},
+   {u:'anon',tx:'我只是想上台演个路人……',t:'16分钟前',likes:112,
+    thread:[{u:'sparkle',tx:'太好了！我们正好缺一个会在关键时刻倒下的路人！',t:'15分钟前',likes:398}]},
+   {u:'anon',tx:'……',t:'14分钟前',likes:245,thread:[{u:'sparkle',tx:'嘻嘻，已经晚啦。',t:'13分钟前',likes:467}]}
+  ]},
+ {id:6,club:'magic',board:'eye',tag:'eye',tagText:'特别关注',hot:1,replies:47,views:12846,time:'10分钟前',
+  author:{u:'anon',sub:'匿名投稿'},
+  title:'学校里什么时候多了个魔法奶龙社？？？这是什么社团？？？',
+  body:'我真的忍不住了。\n\n今天在社团活动室附近看到了一个牌子：\n\n魔法奶龙社。\n\n我本来以为是什么恶搞社团，结果进去一看：\n\n社长头上长着一棵草。\n\n一位副社长头上长角。\n\n另一位副社长据说是学校里很厉害的修理工。\n\n你们到底是什么神奇组合啊？？？\n\n而且社团名字为什么叫奶龙？？？',
+  media:[{bg:'linear-gradient(135deg,#6b4dff,#a06bff)',cap:'门牌 · 魔法奶龙社',icon:'🐉'},{bg:'linear-gradient(135deg,#3aa76d,#6b4dff)',cap:'社长的草 · 据说不会枯萎',icon:'🌱'},{bg:'linear-gradient(135deg,#ff8fa3,#ffc06b)',cap:'副社长的角 · 可以摸吗？',icon:'🦄'},{bg:'linear-gradient(135deg,#4a4a6a,#8a8aaa)',cap:'活动室工具墙 · 别乱动',icon:'🧰'}],
+  comments:[
+   {u:'qianmo',tx:'因为有魔法。',t:'9分钟前',likes:832,thread:[{u:'anon',tx:'……这算解释吗？',t:'9分钟前',likes:287},{u:'qianmo',tx:'算。',t:'8分钟前',likes:1204}]},
+   {u:'aaxi',tx:'因为很可爱呀！而且我觉得这个名字很好听！',t:'9分钟前',likes:512,
+    thread:[{u:'anon',tx:'所以你头上的角是真的吗？',t:'8分钟前',likes:342},{u:'aaxi',tx:'当然是真的！要摸摸看吗？',t:'8分钟前',likes:598},{u:'qianmo',tx:'不要随便让陌生人摸角。',t:'7分钟前',likes:743},{u:'aaxi',tx:'好嘛。',t:'7分钟前',likes:421}]},
+   {u:'anqi',tx:'先说好，社团活动室里的工具不要乱动。上次有人把螺丝刀和魔法道具混在一起了。',t:'8分钟前',likes:678,
+    thread:[{u:'anon',tx:'等等，魔法道具？？？',t:'7分钟前',likes:456},{u:'anqi',tx:'你可以理解为一种特殊设备。',t:'7分钟前',likes:534}]},
+   {u:'anon',tx:'所以你们社团到底研究什么？',t:'7分钟前',likes:398,
+    thread:[{u:'qianmo',tx:'魔法。',t:'6分钟前',likes:921},{u:'anon',tx:'具体一点？',t:'6分钟前',likes:312},{u:'qianmo',tx:'具体就是魔法。',t:'5分钟前',likes:1102},{u:'anqi',tx:'她不想解释。',t:'5分钟前',likes:876},{u:'aaxi',tx:'我们可以表演给你看呀！',t:'5分钟前',likes:645}]},
+   {u:'anon',tx:'我想问一个问题，社长头上的草是真的植物吗？',t:'5分钟前',likes:567,
+    thread:[{u:'qianmo',tx:'是。',t:'4分钟前',likes:802},{u:'anon',tx:'会枯萎吗？',t:'4分钟前',likes:234},{u:'qianmo',tx:'不会。',t:'4分钟前',likes:687},{u:'anon',tx:'能拔吗？',t:'3分钟前',likes:401},{u:'qianmo',tx:'你可以试试。',t:'3分钟前',likes:1320},{u:'anqi',tx:'不要试。',t:'3分钟前',likes:965},{u:'aaxi',tx:'不要试！！',t:'3分钟前',likes:988}]},
+   {u:'anon',tx:'……好的，我不加入了。',t:'2分钟前',likes:743,thread:[{u:'qianmo',tx:'欢迎加入。',t:'1分钟前',likes:1502}]}
+  ]},
+ {id:7,club:null,board:'tree',tag:'anon',tagText:'校园树洞',hot:1,replies:13,views:8934,time:'20分钟前',
+  author:{u:'anon',sub:'校园树洞'},
+  title:'请问学校里有没有哪个社团是正常的？',
+  body:'最近想找一个正常的社团加入，请问有什么推荐？\n\n最好是：不追人、不偷拍、不给书乱画、不抽命运的纸条、社长头上没有奇怪东西的那种。\n\n有这样的社团吗？',
+  comments:[
+   {u:'star',tx:'棒球社！我们很正常！',t:'18分钟前',likes:432,thread:[]},
+   {u:'march',tx:'摄影社也很正常！！',t:'17分钟前',likes:387,thread:[]},
+   {u:'danheng',tx:'文学社。',t:'16分钟前',likes:654,thread:[]},
+   {u:'sparkle',tx:'戏剧社呀，保证每天都有惊喜♡',t:'15分钟前',likes:521,thread:[]},
+   {u:'kaedehara',tx:'园艺社或许是个不错的选择。',t:'14分钟前',likes:498,thread:[]},
+   {u:'qianmo',tx:'魔法奶龙社。',t:'13分钟前',likes:1207,thread:[{u:'anqi',tx:'社长，不要在这种帖子下面打广告。',t:'13分钟前',likes:987},{u:'aaxi',tx:'可是我们真的很好玩呀！',t:'12分钟前',likes:643}]},
+   {u:'dome',tx:'楼主，我建议你退出学校。',t:'11分钟前',likes:1532,thread:[{u:'wanderer',tx:'难得同意一次。',t:'10分钟前',likes:1321}]},
+   {u:'longye',tx:'已经来不及了。',t:'9分钟前',likes:1187,thread:[]}
+  ]}
+];}
+
+/* ===================== 工具 ===================== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>n>=10000?(n/10000).toFixed(1)+'万':n>=1000?(n/1000).toFixed(1)+'k':String(n);
+const ava=(u,cls='')=>{const o=USERS[u];if(!o)return '';
+  const cd=`ava-${u}`; if(S.avaBroken&&S.avaBroken[cd]) return `<div class="ava ${cls}" style="background:${o.c}">${esc(o.n[0])}</div>`;
+  const st=o.av?`background-image:url('${o.av}');background-size:cover;background-position:center;`:`background:${o.c};`;
+  return `<div class="ava ${cls}" style="${st}"><img alt="" src="${o.av||''}" onerror="avaFail(this,'${u}')" style="${o.av?'':'display:none'};width:100%;height:100%;border-radius:50%;object-fit:cover;position:absolute;inset:0;"><span style="${o.av?'':'position:static'};z-index:1">${esc(o.n[0])}</span></div>`;};
+const avaFail=(img,u)=>{img.style.display='none';img.removeAttribute('src');
+  const cd=`ava-${u}`;S.avaBroken=S.avaBroken||{};S.avaBroken[cd]=1;save();};
+const uname=(u,cls='uname')=>{const o=USERS[u];if(!o)return '';return `<span class="${cls}" ${u!=='anon'?`onclick="event.stopPropagation();openDetail(${authorPostId(u)})"`:''}>${esc(o.n)}</span>`+(o.cert?'<span class="tag-v" title="已认证"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 6.8L22 10l-5.5 4.7L18 22l-6-3.6L6 22l1.5-7.3L2 10l7.6-1.2z"/></svg></span>':'');};
+const authorPostId=u=>{const p=POSTS().find(p=>p.author&&p.author.u===u);return p?p.id:1;};
+
+const NS='detail-state';
+let S=(()=>{try{return JSON.parse(localStorage.getItem(NS))||{}}catch(e){return{}}})();
+S.likes=S.likes||{};S.likesT=S.likesT||{};S.follows=S.follows||{};S.tpages=S.tpages||{};S.treads=S.treads||{};S.history=S.history||[];S.avaBroken=S.avaBroken||{};
+(function(){try{localStorage.setItem(NS,JSON.stringify(S))}catch(e){}})();
+const save=()=>{try{localStorage.setItem(NS,JSON.stringify(S))}catch(e){}};
+
+const HEART_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>';
+const CHAT_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>';
+const REPOST_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>';
+const SHARE_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>';
+const REPLY_SVG='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17l-5-5 5-5"/><path d="M4 12h11a4 4 0 014 4v0a4 4 0 01-4 4H8"/></svg>';
+const EYE_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+
+/* ===================== Toast ===================== */
+let toastTimer;
+function toast(msg){
+  const el=$('#toast');el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),1800);
+}
+
+/* ===================== 侧边栏 ===================== */
+function renderSide(){
+  $('#sideNav').innerHTML=NAV.map(n=>{
+    if(n.gap) return '<div class="nav-divider"></div>';
+    const on = n.k===curBoard ? ' on' : '';
+    const badge = n.badge ? `<span class="badge">${n.badge}</span>` : '';
+    return `<button class="nav-item${on}" onclick="filterBoard('${n.k}',this)">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${n.ico}</svg>
+      <span>${n.t}</span>${badge}</button>`;
+  }).join('');
+}
+function filterBoard(k,el){
+  if(!['all','obs','fun','anon','recruit','daily','hot','tree'].includes(k)){toast('演示版暂未开放「'+el.textContent.trim()+'」');return;}
+  curBoard=k;renderSide();renderTabs();
+  $$('.nav-item').forEach(n=>n.classList.toggle('on',n.textContent.trim()===BOARD[k]||(k==='all'&&n.textContent.trim()==='论坛首页')));
+  renderFeed();window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ===================== 首页 ===================== */
+const TABS=[{k:'all',t:'全部'},{k:'obs',t:'社团观察'},{k:'fun',t:'校园趣闻'},{k:'anon',t:'匿名投稿'},{k:'recruit',t:'社团招新'},{k:'daily',t:'社团日常'},{k:'hot',t:'校园热议'},{k:'tree',t:'校园树洞'}];
+let curBoard='all',curSort='hot';
+function renderTabs(){ $('#tabs').innerHTML=TABS.map(t=>`<button class="tab ${t.k===curBoard?'on':''}" onclick="filterBoard('${t.k}',this)">${t.t}</button>`).join(''); }
+function setSort(el){curSort=el.dataset.sort;$$('.chip').forEach(c=>c.classList.toggle('on',c===el));renderFeed();}
+
+function getList(){
+  const data=POSTS();
+  let l=data.filter(p=>curBoard==='all'||p.board===curBoard);
+  const h=p=>p.hot*1e6+p.replies*10+p.views;
+  if(curSort==='hot')      l.sort((a,b)=>h(b)-h(a));
+  else if(curSort==='new') l.sort((a,b)=>a.id-b.id);
+  else if(curSort==='rep') l.sort((a,b)=>b.replies-a.replies);
+  else if(curSort==='view')l.sort((a,b)=>b.views-a.views);
+  return l;
+}
+function mediaHTML(m){ return ''; }
+function pollHTML(p){ return ''; }
+function headHTML(p){
+  const a=p.author.u==='anon'?null:USERS[p.author.u];
+  const anonName=p.author.sub||'匿名投稿';
+  const titleHTML=a
+    ? uname(p.author.u)+` <span style="color:var(--text-3);font-weight:400;font-size:13px">${esc(a.t)}</span>`
+    : `<span class="uname sub">${esc(anonName)}</span>`;
+  return `<div class="head">
+    ${ava(p.author.u,'online')}
+    <div class="names"><div class="top">${titleHTML}</div>
+      <div class="meta">
+        ${p.hot?`<span class="time-hot hot"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14a8 8 0 008 8 8 8 0 008-8C20 9.61 17.92 6.12 13.5.67z"/></svg>热榜 ${p.hot}</span>`:''}
+        <span class="time-hot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${fmt(p.replies)} 讨论</span>
+        <span class="dot-sep">·</span><span>${esc(p.time)}</span>
+        <span class="dot-sep">·</span><span>浏览 ${fmt(p.views)}</span>
+      </div>
+    </div>
+    <button class="more-btn" onclick="event.stopPropagation();toast('更多：${a?esc(a.t):esc(anonName)}')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+    </button>
+  </div>`;
+}
+function actHTML(p){
+  const liked=S.likes[p.id];const base=p.replies||0;
+  const likeN=fmt((p.replies||0)+(liked||0));
+  return `<div class="actbar">
+    <button class="act ${liked?'like on':''}" onclick="event.stopPropagation();toggleLike(${p.id})">
+      <span class="a-ico">${HEART_SVG}</span><span class="num">${fmt((p.replies||0)+(liked||0))}</span>
+    </button>
+    <button class="act com" onclick="event.stopPropagation();openDetail(${p.id})">
+      <span class="a-ico">${CHAT_SVG}</span><span class="num">${fmt(p.replies)}</span>
+    </button>
+    <button class="act rep" onclick="event.stopPropagation();toast('转发成功（演示）')">
+      <span class="a-ico">${REPOST_SVG}</span><span class="num">${fmt(p.replies||0)}</span>
+    </button>
+    <button class="act" onclick="event.stopPropagation();toast('分享链接已复制（演示）')">
+      <span class="a-ico">${SHARE_SVG}</span><span class="num">分享</span>
+    </button>
+  </div>`;
+}
+function previewHTML(p){
+  const cs=p.comments.slice(0,3);
+  if(!cs.length)return '';
+  return `<div class="c-prev">
+    <div class="c-prev-h">💬 热门评论（${p.replies}）</div>
+    ${cs.map(c=>{
+      const u=USERS[c.u];
+      return `<div class="c-line">
+        <div class="ava sm" style="background:${u.c}">${esc(u.n[0])}</div>
+        <div class="ct">
+          <span class="cn ${c.u==='anon'?'sub':''}">${esc(u.n)}</span>
+          <span class="cx">：${esc(c.tx).slice(0,46)}${c.tx.length>46?'…':''}</span>
+          <div style="color:var(--text-3);font-size:11.5px;margin-top:2px">♥ ${c.likes}${c.thread&&c.thread.length?` · ↳ ${c.thread.length} 条回复`:''}</div>
+        </div>
+      </div>`;
+    }).join('')}
+    <div class="c-more" onclick="event.stopPropagation();openDetail(${p.id})">查看全部 ${p.replies} 条评论 ›</div>
+  </div>`;
+}
+function cardHTML(p){
+  return `<div class="post" onclick="openDetail(${p.id})">
+    ${headHTML(p)}
+    <span class="board-tag ${p.tag}">${esc(p.tagText)}</span>
+    <div class="p-body" style="margin-top:9px">
+      <h3 class="p-title">${esc(p.title)}</h3>
+      <p class="p-text">${esc(p.body)}</p>
+      ${mediaHTML(p.media)}
+      ${pollHTML(p.poll)}
+    </div>
+    ${actHTML(p)}
+    ${previewHTML(p)}
+  </div>`;
+}
+function renderFeed(){
+  const l=getList();
+  $('#feed').innerHTML=l.length?l.map(cardHTML).join(''):`<div class="post"><div class="p-body"><h3 class="p-title">这个板块还没有帖子</h3><p class="p-text">换个板块逛逛，或者点右下角发个帖？</p></div></div>`;
+  $('#feedEnd').textContent=l.length?`—— 共 ${l.length} 条帖子 · 已到底啦 ——`:'';
+}
+
+/* ===================== 右侧 ===================== */
+function renderHot(){
+  const list=POSTS().slice().sort((a,b)=>(b.hot*1e6+b.replies*10+b.views)-(a.hot*1e6+a.replies*10+a.views)).slice(0,6);
+  $('#hotList').innerHTML=list.map((p,i)=>`<div class="hot-item" onclick="openDetail(${p.id})">
+    <div class="hot-rank ${i<3?'top3':''}">${i+1}</div>
+    <div class="hot-ct"><b>${esc(p.title).slice(0,26)}${p.title.length>26?'…':''}</b>
+      <span><span>#${esc(p.tagText)}</span><span>♥ ${fmt(p.replies)}</span><span>🔥 ${fmt(p.views)}</span></span></div></div>`).join('');
+}
+function renderActive(){
+  const ids=['qianmo','dome','march','sparkle','danheng','kaedehara'];
+  $('#activeList').innerHTML=ids.map((id,i)=>{
+    const u=USERS[id];const on=S.follows[id];
+    return `<div class="member" onclick="openDetail(${authorPostId(id)})">
+      <div class="ava" style="background:${u.c}">${esc(u.n[0])}</div>
+      <div class="mi"><b>${esc(u.n)}</b><span>${esc(u.t)}</span></div>
+      <button class="follow ${on?'on':''}" onclick="event.stopPropagation();toggleFollow('${id}',this)">${on?'已关注':'+ 关注'}</button></div>`;
+  }).join('');
+}
+function renderClubs(){
+  const ks=['magic','baseball','photo','literature','drama','garden'];
+  $('#clubList').innerHTML=ks.map(k=>{
+    const c=CLUBS[k];const on=S.follows['club_'+k];
+    return `<div class="member">
+      <div class="ava" style="background:${c.c}">${esc(c.n[0])}</div>
+      <div class="mi"><b>${esc(c.n)}</b><span>${Math.floor(Math.random()*40+12)} 位活跃成员</span></div>
+      <button class="follow ${on?'on':''}" onclick="event.stopPropagation();toggleFollow('club_${k}',this)">${on?'已加入':'+ 加入'}</button></div>`;
+  }).join('');
+}
+function toggleFollow(key,btn){
+  S.follows[key]=!S.follows[key];save();
+  btn.classList.toggle('on',S.follows[key]);
+  btn.textContent=S.follows[key]?(key.indexOf('club_')===0?'已加入':'已关注'):'+ '+(key.indexOf('club_')===0?'加入':'关注');
+  toast(S.follows[key]?(key.indexOf('club_')===0?'已加入社团':'已关注'):'已取消关注');
+}
+
+/* ===================== 详情页 ===================== */
+let curPost=null,comSort='hot';
+function openDetail(id){
+  const p=POSTS().find(x=>x.id===id);if(!p)return;
+  curPost=p;
+  if(!S.history.includes(id)){S.history.unshift(id);S.history=S.history.slice(0,20);save();}
+  $('#dTitle').textContent=p.title.length>18?p.title.slice(0,18)+'…':p.title;
+  $('#dPost').innerHTML=
+    headHTML(p)+
+    `<span class="board-tag ${p.tag}">${esc(p.tagText)}</span>
+     <div style="margin-top:9px">
+       <h3 class="p-title" style="font-size:19px;-webkit-line-clamp:unset">${esc(p.title)}</h3>
+       <p class="p-text" style="font-size:15.5px">${esc(p.body)}</p>
+       ${mediaHTML(p.media)}${pollHTML(p.poll)}
+     </div>
+     <div class="detail-act">${actHTML(p)}</div>
+     <div class="com-editor">
+       <div class="ava" style="background:#5b8cff">我</div>
+       <textarea id="comInput" placeholder="说点什么吧…（演示：回车不提交，点发送）"></textarea>
+       <button class="send" onclick="submitCom()">发送</button>
+     </div>`;
+  renderCom();
+  $('#detail').classList.add('show');document.body.style.overflow='hidden';
+  $('#detail').scrollTop=0;
+}
+function closeDetail(){ $('#detail').classList.remove('show');document.body.style.overflow='';curPost=null; }
+function toggleLike(id){
+  S.likes[id]=!S.likes[id];save();
+  if(curPost&&curPost.id===id)renderCom(true);
+  renderFeed();
+  toast(S.likes[id]?'已点赞 ❤️':'已取消点赞');
+}
+function submitCom(){
+  const ta=$('#comInput');const v=ta.value.trim();
+  if(!v){toast('评论内容不能为空');ta.focus();return;}
+  curPost.comments.push({u:'me',tx:v,t:'刚刚',likes:0,thread:[]});
+  curPost.replies++;
+  ta.value='';
+  renderCom();renderFeed();toast('评论成功（演示，未持久化）');
+}
+function comActHTML(c,idx,total){
+  const liked=S.likesT[c._k];
+  return `<div class="com-acts">
+    <a class="${liked?'liked':''}" onclick="toggleTLike(${idx})">${liked?'♥':'♡'} ${fmt((c.likes||0)+(liked||0))}</a>
+    <a onclick="toggleReply(${idx})">${REPLY_SVG} 回复</a>
+    <a>举报</a>
+    <span class="floor">${total-idx} 楼</span></div>`;
+}
+function threadPageHTML(c,idx){
+  const per=5;const arr=c.thread||[];const total=Math.max(1,Math.ceil(arr.length/per));
+  const pg=S.tpages[idx]||1;
+  if(arr.length<=per)return '';
+  let h='';
+  if(pg>1)h+=`<a onclick="setTPage(${idx},${pg-1})">‹</a>`;
+  for(let i=1;i<=total;i++) h+=`<a class="${i===pg?'on':''}" onclick="setTPage(${idx},${i})">${i}</a>`;
+  if(pg<total)h+=`<a onclick="setTPage(${idx},${pg+1})">›</a>`;
+  return `<div class="thread-page">${h}</div>`;
+}
+function threadHTML(c,idx,visible){
+  const arr=c.thread||[];const cut=arr.slice(0,visible);
+  return `<div class="thread">
+    ${cut.map((tr,j)=>{
+      const u=USERS[tr.u]||{n:'我',c:'#5b8cff'};const on=!!S.likesT['t_'+idx+'_'+j];
+      return `<div class="thread-item">
+        <div class="ava xs" style="background:${u.c}">${esc(u.n[0])}</div>
+        <div class="thread-ct">
+          <span class="cn ${tr.u==='anon'?'rep':''}">${esc(u.n)}</span>
+          <span class="cn op"> 回复 </span>
+          <span class="cn rep">${esc((c.u==='anon'?'匿名用户':(USERS[c.u]||{}).n)||'用户')}</span>
+          <div class="tx">${esc(tr.tx)}</div>
+          <div class="ft">
+            <span>${esc(tr.t)}</span>
+            <a class="${on?'liked':''}" onclick="toggleTLike('t_${idx}_${j}',this)">${on?'♥':'♡'} ${fmt((tr.likes||0)+(on||0))}</a>
+            <a onclick="focusThread(${idx})">回复</a>
+          </div>
+        </div></div>`;
+    }).join('')}
+    ${arr.length>visible?`<div class="thread-more" onclick="expandThread(${idx})">↳ 展开剩余 ${arr.length-visible} 条回复</div>`:''}
+    ${threadPageHTML(c,idx)}
+    <div class="thread-reply ${S.treads[idx]?'show':''}" id="tre${idx}">
+      <input type="text" placeholder="回复 ${esc((USERS[c.u]||{n:'用户'}).n)}…" onkeydown="if(event.key==='Enter')sendThread(${idx},this)">
+      <button onclick="sendThread(${idx},this.previousElementSibling)">回复</button>
+    </div>
+  </div>`;
+}
+function setTPage(idx,pg){S.tpages[idx]=pg;save();renderCom();}
+function expandThread(idx){S.treads[idx]=1;delete S.tpages[idx];save();renderCom();}
+function toggleReply(idx){S.treads[idx]=!S.treads[idx];save();renderCom();}
+function focusThread(idx){S.treads[idx]=1;save();renderCom();setTimeout(()=>{$('#tre'+idx).querySelector('input').focus()},60);}
+function sendThread(idx,input){
+  const v=input.value.trim();if(!v){toast('回复内容不能为空');return;}
+  curPost.comments[idx].thread.push({u:'me',tx:v,t:'刚刚',likes:0});
+  input.value='';S.treads[idx]=0;save();renderCom();renderFeed();toast('回复成功（演示）');
+}
+function toggleTLike(k,_el){
+  if(typeof k==='number'){S.likesT['c_'+k]=!S.likesT['c_'+k];k='c_'+k;}
+  else S.likesT[k]=!S.likesT[k];
+  save();renderCom(true);
+}
+
+function renderCom(same){
+  if(!curPost)return;
+  const cs=curPost.comments.slice();
+  if(comSort==='new')cs.sort((a,b)=>0);
+  else cs.sort((a,b)=>(b.likes||0)-(a.likes||0));
+  const total=cs.length;
+  $('#dCom').innerHTML=`<div class="com-list-h">
+      <span>全部评论</span><span>${total} 条</span>
+      <span class="sort-com">
+        <a class="${comSort==='hot'?'on':''}" onclick="setComSort('hot')">最热</a>
+        <a class="${comSort==='new'?'on':''}" onclick="setComSort('new')">最新</a>
+      </span>
+    </div>
+    ${total?cs.map((c,i)=>{
+      c._k='c_'+i;
+      const u=USERS[c.u]||{n:'我',c:'#5b8cff',t:'楼主',cert:0};
+      const me=c.u==='me';
+      const visible= (c.thread||[]).length<=5&&!S.treads[i] ? (c.thread||[]).length : (c.thread||[]).length;
+      return `<div class="com-item">
+        <div class="com-head">
+          <div class="ava ${me?'':'online'}" style="background:${u.c}">${esc(me?'我':u.n[0])}</div>
+          <div class="com-main">
+            <div class="com-top">
+              <span class="uname ${me?'':'sub'}">${esc(me?'我':u.n)}</span>
+              ${u.cert&&!me?'<span class="tag-v" title="已认证"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 6.8L22 10l-5.5 4.7L18 22l-6-3.6L6 22l1.5-7.3L2 10l7.6-1.2z"/></svg></span>':''}
+              ${me?'<span class="board-tag anon">楼主</span>':''}
+              ${c.u==='anon'?'<span class="board-tag anon">匿名</span>':''}
+              <span class="com-time">${esc(c.t)}</span>
+            </div>
+            <div class="com-body">${esc(c.tx)}</div>
+            ${comActHTML(c,i,total)}
+            ${threadHTML(c,i,visible)}
+          </div>
+        </div>
+      </div>`;
+    }).join(''):`<div style="padding:34px 0;text-align:center;color:var(--text-3);font-size:13.5px">还没有评论，来抢沙发吧～</div>`}`;
+}
+function setComSort(k){comSort=k;renderCom();}
+
+/* ===================== 初始化 ===================== */
+function init(){
+  renderSide();renderTabs();renderFeed();renderHot();renderActive();renderClubs();
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#detail').classList.contains('show'))closeDetail();});
+}
+init();
+</script>
+</body>
+</html>

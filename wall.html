@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>校园匿名墙</title>
+<style>
+:root{
+  --bg:#eef3f0;
+  --card:#ffffff;
+  --line:#e3ebe6;
+  --text:#2c3a35;
+  --muted:#7c8b85;
+  --brand:#4a9d7c;
+  --brand2:#3a8a6c;
+  --hot:#f2994a;
+  --shadow:0 2px 14px rgba(44,58,53,.07);
+  --c-naxida:#5fa86a;
+  --c-wendi:#7fc08a;
+  --c-soldier:#6b7480;
+  --c-furuhua:#e8758a;
+  --c-qingmo:#7fb89a;
+  --c-guning:#9b7ec2;
+  --c-axi:#e6b755;
+  --c-anqi:#5b8fc7;
+  --c-xing:#f2a65a;
+  --c-xiong:#6fbfb6;
+  --c-sanyue:#7ec0e0;
+  --c-danheng:#6c9eb5;
+  --c-baseball:#5a8fc4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"PingFang SC","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+
+/* 顶部栏 */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-inner{
+  max-width:920px;margin:0 auto;padding:12px 18px;
+  display:flex;align-items:center;gap:14px;
+}
+.logo{font-weight:800;font-size:18px;color:var(--brand2);white-space:nowrap}
+.logo span{font-size:12px;font-weight:500;color:var(--muted);margin-left:6px}
+.top-search{
+  flex:1;height:34px;border-radius:17px;
+  background:var(--bg);border:1px solid var(--line);
+  display:flex;align-items:center;padding:0 14px;gap:8px;color:var(--muted);font-size:13px;
+}
+.top-actions{display:flex;gap:8px;align-items:center}
+.btn{
+  border:none;cursor:pointer;font-family:inherit;font-size:13px;
+  border-radius:18px;padding:7px 16px;transition:.18s;
+}
+.btn-primary{background:var(--brand);color:#fff;font-weight:600}
+.btn-primary:hover{background:var(--brand2)}
+.btn-ghost{background:var(--bg);color:var(--text)}
+.btn-ghost:hover{background:var(--line)}
+
+/* 布局 */
+.wrap{max-width:920px;margin:0 auto;padding:18px;display:flex;gap:20px;align-items:flex-start}
+.side-left,.side-right{width:190px;flex-shrink:0;position:sticky;top:74px}
+.side-left .block,.side-right .block{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:8px;margin-bottom:14px;box-shadow:var(--shadow);
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:11px;cursor:pointer;
+  font-size:14px;color:var(--text);transition:.15s;width:100%;border:none;
+  background:transparent;text-align:left;font-family:inherit;margin-bottom:2px;
+}
+.nav-item:hover{background:#f3f7f5}
+.nav-item.active{background:var(--brand);color:#fff;font-weight:600}
+.side-title{
+  font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;
+  padding:10px 12px 6px;
+}
+.mini-tag{
+  display:inline-block;font-size:11px;padding:2px 8px;border-radius:9px;
+  background:#f3f7f5;color:var(--muted);margin:3px 4px;
+}
+.mini-tag.hot{background:#fdeee0;color:var(--hot)}
+.rank-item{
+  display:flex;gap:8px;padding:8px 10px;border-radius:10px;cursor:pointer;font-size:13px;
+}
+.rank-item:hover{background:#f3f7f5}
+.rank-num{color:var(--brand);font-weight:800;font-size:13px;width:16px}
+.rank-txt{flex:1;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+
+.main{flex:1;min-width:0}
+.zone-head{display:flex;align-items:baseline;gap:10px;margin:4px 2px 14px}
+.zone-head h2{font-size:19px}
+.zone-head p{font-size:12px;color:var(--muted)}
+.section-hr{display:flex;align-items:center;gap:10px;margin:26px 2px 14px}
+.section-hr h3{font-size:16px;white-space:nowrap}
+.section-hr .line{flex:1;height:1px;background:var(--line)}
+.section-hr .more{font-size:12px;color:var(--muted);cursor:pointer}
+.section-hr .more:hover{color:var(--brand)}
+
+/* 帖子卡片 */
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow);transition:.16s;
+}
+.card:hover{border-color:#cfe0d8}
+.card-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.badge{font-size:11px;padding:3px 9px;border-radius:8px;font-weight:600;white-space:nowrap}
+.badge.teacher{background:#e4f0e8;color:#2f7a4d}
+.badge.hot-p{background:#fdeee0;color:var(--hot)}
+.badge.anon{background:#eaeef2;color:#5a6b74}
+.badge.vote{background:#e6ecfb;color:#4a6bd6}
+.badge.lost{background:#f0e6fb;color:#7a4ad6}
+.badge.daily{background:#e4f5f2;color:#2f8a80}
+.badge.sr{background:#fbe4ec;color:#c24a7a}
+.badge.file{background:#eef0e4;color:#6d7a2f}
+.badge.dossier{background:#f0e6fb;color:#8a4ad6}
+.badge.senior{background:#fbe9e0;color:#d66a2f}
+.badge.today{background:#fdeee0;color:#d67a2f}
+.hot-flag{
+  font-size:11px;font-weight:700;color:#fff;background:var(--hot);
+  padding:2px 7px;border-radius:6px;
+}
+.card-title{
+  font-size:16.5px;font-weight:700;cursor:pointer;line-height:1.5;margin-bottom:8px;
+}
+.card-title:hover{color:var(--brand2)}
+.meta{font-size:12px;color:var(--muted);margin-bottom:10px}
+.meta b{color:#5a6b74;font-weight:600}
+.body{font-size:14.5px;color:#3a4a44;white-space:pre-line}
+.body.excerpt{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.comments{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px;display:none}
+.card.open .comments{display:block}
+.card.open .body.excerpt{display:block;-webkit-line-clamp:unset;overflow:visible;white-space:pre-line}
+.cm{display:flex;gap:9px;padding:6px 0;font-size:14px;align-items:flex-start}
+.cm-name{font-weight:700;font-size:13px;white-space:nowrap;flex-shrink:0;min-width:52px}
+.cm-body{flex:1;word-break:break-word}
+.cm-self .cm-name{font-style:normal}
+.cm.reply{padding-left:26px;position:relative}
+.cm.reply::before{
+  content:"";position:absolute;left:10px;top:0;bottom:14px;width:2px;background:var(--line);
+}
+.toggle{
+  margin-top:10px;font-size:13px;color:var(--brand);cursor:pointer;user-select:none;font-weight:600;
+}
+.toggle:hover{color:var(--brand2)}
+
+/* 头像 */
+.av{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:14px;font-weight:700;
+  background:linear-gradient(135deg,var(--g1),var(--g2));
+  box-shadow:0 1px 4px rgba(0,0,0,.12);
+}
+.av-lg{width:56px;height:56px;font-size:20px;border-radius:16px}
+.av-sm{width:26px;height:26px;font-size:11px}
+.av-naxida{--g1:#7ec08a;--g2:#3f8a52}
+.av-wendi{--g1:#a8d8b0;--g2:#5fa86a}
+.av-soldier{--g1:#8b95a1;--g2:#4a5360}
+.av-furuhua{--g1:#f4a3b4;--g2:#d95270}
+.av-qingmo{--g1:#a8dcc0;--g2:#4f9a76}
+.av-guning{--g1:#b69be0;--g2:#6f4fb0}
+.av-axi{--g1:#f4d98a;--g2:#d6a43a}
+.av-anqi{--g1:#8fbde0;--g2:#3a6fa8}
+.av-xing{--g1:#f6c08a;--g2:#e08a3c}
+.av-xiong{--g1:#9fdcd4;--g2:#3fae9e}
+.av-sanyue{--g1:#a8d8ee;--g2:#4a9ed6}
+.av-danheng{--g1:#9cc4d8;--g2:#4a7e9e}
+.av-anon{--g1:#c8d0d8;--g2:#8a97a5}
+.av-baseball{--g1:#8fb8e0;--g2:#3a6fa8}
+.av-official{--g1:#c7b8e8;--g2:#8a6ad6}
+
+/* 气泡 */
+.b{display:inline-block;padding:6px 11px;border-radius:12px;font-size:14px;max-width:100%}
+.b-naxida{background:#eaf5ec;color:#2c6b3d}
+.b-wendi{background:#ecf6ee;color:#3f7a4d}
+.b-soldier{background:#eef0f2;color:#3c4650}
+.b-furuhua{background:#fdeef1;color:#b83a5a}
+.b-qingmo{background:#eaf6ef;color:#2f7a55}
+.b-guning{background:#f1ecfb;color:#6a3fb0}
+.b-axi{background:#fdf6e3;color:#8a6a20}
+.b-anqi{background:#eaf2fb;color:#2f5f9a}
+.b-xing{background:#fdf0e3;color:#a05a20}
+.b-xiong{background:#e3f5f2;color:#2f8a76}
+.b-sanyue{background:#eaf4fb;color:#2f6fa0}
+.b-danheng{background:#eaf2f6;color:#3a6a85}
+.b-official{background:#f3eefb;color:#6a4aa0}
+.n-self{font-style:italic;color:#b03a5a;font-weight:700}
+
+/* 档案卡 */
+.dossier{
+  background:linear-gradient(135deg,#fbfcff,#f4f8f6);
+  border:1px solid #dde8e2;border-radius:18px;overflow:hidden;margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
+.dos-head{
+  padding:18px 20px;display:flex;gap:16px;align-items:center;
+  background:linear-gradient(120deg,#eaf4ef,#f5f0fa);
+  border-bottom:1px solid #e0ebe5;flex-wrap:wrap;
+}
+.dos-name{font-size:20px;font-weight:800}
+.dos-level{
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:9px;
+  background:#fdeee0;color:var(--hot);border:1px solid #f5d4b0;
+}
+.dos-tabs{display:flex;gap:6px;margin-left:auto}
+.dos-tab{
+  border:1px solid #d5e0db;background:#fff;color:var(--muted);
+  padding:5px 14px;border-radius:16px;font-size:13px;cursor:pointer;font-family:inherit;transition:.15s;
+}
+.dos-tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+.dos-tab:hover:not(.active){background:#f3f7f5}
+.dos-body{padding:18px 20px}
+.dos-table{width:100%;font-size:13.5px;margin-bottom:14px}
+.dos-table td{padding:6px 4px;border-bottom:1px dashed #e6eeea;vertical-align:top}
+.dos-table td:first-child{color:var(--muted);width:84px;white-space:nowrap}
+.dos-table td:last-child{font-weight:600}
+.stars{color:#e6a82e;letter-spacing:1px}
+.quote-box{
+  background:#fff;border-left:3px solid var(--brand);border-radius:10px;
+  padding:12px 14px;font-size:14px;color:#4a5a54;margin:10px 0;
+  box-shadow:0 1px 6px rgba(44,58,53,.05);
+}
+.quote-box .qmark{font-size:26px;color:#cfe0d8;line-height:.4;vertical-align:-6px}
+.caps{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.caps span{
+  font-size:12px;padding:4px 11px;border-radius:14px;
+  background:#eef4f1;color:#3f7a5a;border:1px solid #d5e5dd;cursor:default;
+}
+.caps span:hover{background:#e2efe8}
+.bar{height:8px;border-radius:4px;background:#e8efec;overflow:hidden;margin:4px 0 2px}
+.bar > i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--brand),#7fc0a0)}
+.dos-foot{
+  padding:12px 20px;border-top:1px dashed #e0ebe5;font-size:12px;color:var(--muted);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+}
+
+/* 投票 */
+.vote-list{margin-top:8px}
+.vote-opt{
+  display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;
+  margin-bottom:9px;cursor:pointer;transition:.15s;position:relative;overflow:hidden;background:#fff;
+}
+.vote-opt:hover{border-color:var(--brand);background:#f6faf8}
+.vote-opt.sel{border-color:var(--brand);background:#eaf5ef;font-weight:600}
+.vote-opt .bar-fill{
+  position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#eaf5ef,#d5eee2);
+  width:0;transition:width .5s ease;z-index:0;
+}
+.vote-opt .vrow{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.vote-opt .vtxt{font-size:14px}
+.vote-opt .vnum{font-size:12px;color:var(--muted);white-space:nowrap}
+.vote-opt.done{cursor:default}
+.vote-opt.done:hover{border-color:var(--line);background:#fff}
+
+/* 树洞投稿框 */
+.submit-box{
+  background:var(--card);border:2px dashed var(--line);border-radius:16px;
+  padding:18px;margin-bottom:14px;
+}
+.submit-box h4{font-size:14px;margin-bottom:10px;color:var(--muted)}
+.submit-box textarea{
+  width:100%;min-height:80px;border:1px solid var(--line);border-radius:11px;
+  padding:11px;font-family:inherit;font-size:14px;resize:vertical;color:var(--text);
+}
+.submit-box textarea:focus{outline:none;border-color:var(--brand)}
+.submit-bar{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+
+/* 弹窗 */
+.mask{
+  position:fixed;inset:0;background:rgba(30,42,38,.45);z-index:100;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.mask.show{display:flex}
+.modal{
+  background:#fff;border-radius:18px;width:100%;max-width:480px;
+  padding:22px;box-shadow:0 12px 40px rgba(0,0,0,.18);max-height:86vh;overflow:auto;
+}
+.modal h3{margin-bottom:14px;font-size:18px}
+.modal label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 5px}
+.modal input,.modal textarea,.modal select{
+  width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;
+  font-family:inherit;font-size:14px;color:var(--text);
+}
+.modal textarea{min-height:100px;resize:vertical}
+.modal input:focus,.modal textarea:focus,.modal select:focus{outline:none;border-color:var(--brand)}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+
+.footer{text-align:center;font-size:12px;color:var(--muted);padding:26px 18px 40px}
+.footer a{margin:0 8px;cursor:pointer}
+.footer a:hover{color:var(--brand)}
+
+.toast{
+  position:fixed;left:50%;bottom:40px;transform:translateX(-50%) translateY(20px);
+  background:#2c3a35;color:#fff;padding:11px 22px;border-radius:22px;font-size:13.5px;
+  opacity:0;pointer-events:none;transition:.25s;z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.2);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:900px){
+  .side-left{display:block;width:100%;position:static;max-height:none;top:auto;margin-bottom:14px}
+  .side-left .block{margin-bottom:10px}
+  .side-left .side-title{display:none}
+  .side-right{display:none}
+  .top-search{display:none}
+  .nav-list{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px}
+  .nav-list::-webkit-scrollbar{display:none}
+  .nav-item{flex:0 0 auto;white-space:nowrap;margin-bottom:0;text-align:center;padding:8px 14px}
+  .nav-item.active{border-left:none;border-bottom:3px solid var(--brand)}
+  .wrap{display:block}
+  .main{margin-left:0;min-height:0}
+  .rank-item,.tag-chip{white-space:nowrap}
+}
+@media (max-width:560px){
+  .wrap{padding:12px}
+  .card{padding:14px}
+  .dos-tabs{margin-left:0;width:100%}
+  .topbar-inner{flex-wrap:wrap;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="logo">校园匿名墙 <span>校园论坛 · 匿名版</span></div>
+    <div class="top-search">搜索帖子、人物、社团</div>
+    <div class="top-actions">
+      <button class="btn btn-ghost" onclick="showToast('已刷新')">刷新</button>
+      <button class="btn btn-primary" onclick="openPost()">发帖</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="side-left">
+    <div class="block">
+      <div class="side-title">分区导航</div>
+      <div class="nav-list">
+        <button class="nav-item active" data-go="teacher">教师专区</button>
+        <button class="nav-item" data-go="people">人物观察</button>
+        <button class="nav-item" data-go="wall">校园匿名墙</button>
+        <button class="nav-item" data-go="senior">高三专区</button>
+        <button class="nav-item" data-go="dossier">人物档案</button>
+        <button class="nav-item" data-go="treehole">匿名树洞</button>
+        <button class="nav-item" data-go="sighting">校园目击</button>
+        <button class="nav-item" data-go="office">老师办公室</button>
+        <button class="nav-item" data-go="voting">全校投票</button>
+        <button class="nav-item" data-go="explain">谁来解释一下</button>
+      </div>
+    </div>
+    <div class="block">
+      <div class="side-title">今日热榜</div>
+      <div class="rank-item"><span class="rank-num">1</span><span class="rank-txt">高三魔法奶龙社社长疑似黑化？</span></div>
+      <div class="rank-item"><span class="rank-num">2</span><span class="rank-txt">浅漠头上的草到底是什么？</span></div>
+      <div class="rank-item"><span class="rank-num">3</span><span class="rank-txt">散兵到底是怎么想的？</span></div>
+      <div class="rank-item"><span class="rank-num">4</span><span class="rank-txt">花火是不是全校最会骗人的人？</span></div>
+      <div class="rank-item"><span class="rank-num">5</span><span class="rank-txt">温迪老师是不是经常忘课？</span></div>
+    </div>
+    <div class="block">
+      <div class="side-title">热门标签</div>
+      <div>
+        <span class="mini-tag hot">黑化</span>
+        <span class="mini-tag">棒球社</span>
+        <span class="mini-tag">魔法奶龙社</span>
+        <span class="mini-tag hot">传闻</span>
+        <span class="mini-tag">表白</span>
+        <span class="mini-tag">失物招领</span>
+        <span class="mini-tag">目击</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main" id="main"></main>
+
+  <aside class="side-right">
+    <div class="block">
+      <div class="side-title">在线状态</div>
+      <div style="padding:6px 10px;font-size:13px">
+        <div style="display:flex;align-items:center;gap:8px;margin:5px 0"><span class="av av-sm av-soldier">散</span><span>散兵</span></div>
+        <div style="display:flex;align-items:center;gap:8px;margin:5px 0"><span class="av av-sm av-furuhua">花</span><span>花火</span></div>
+        <div style="display:flex;align-items:center;gap:8px;margin:5px 0"><span class="av av-sm av-qingmo">漠</span><span>浅漠</span></div>
+        <div style="display:flex;align-items:center;gap:8px;margin:5px 0"><span class="av av-sm av-axi">喜</span><span>阿喜</span></div>
+        <div style="display:flex;align-items:center;gap:8px;margin:5px 0"><span class="av av-sm av-anqi">柒</span><span>安柒</span></div>
+        <div style="color:var(--muted);font-size:12px;margin-top:8px">共 2,186 人在线 · 328 位匿名</div>
+      </div>
+    </div>
+    <div class="block">
+      <div class="side-title">版规</div>
+      <div style="padding:4px 10px;font-size:12.5px;color:#5a6b74;line-height:1.9">
+        1. 匿名不等于免责<br>
+        2. 禁止公开真实姓名<br>
+        3. 传闻请标注来源<br>
+        4. 角色本人有权下场<br>
+        5. 请勿扰民（尤其路灯）
+      </div>
+    </div>
+    <div class="block">
+      <div class="side-title">活跃社团</div>
+      <div style="padding:6px 10px;font-size:13px">
+        <div>魔法奶龙社 <span style="color:var(--muted)">· 3人</span></div>
+        <div>棒球社 <span style="color:var(--muted)">· 14人</span></div>
+        <div>戏剧社 <span style="color:var(--muted)">· 9人</span></div>
+        <div>音乐社 <span style="color:var(--muted)">· 6人</span></div>
+        <div>园艺社 <span style="color:var(--muted)">· 6人</span></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer class="footer">
+  校园匿名墙 · 纯属校园创作 · 如有雷同纯属巧合<br>
+  <a onclick="showToast('已举报，版主正在喝茶')">举报</a>·
+  <a onclick="showToast('感谢支持')">关于</a>·
+  <a onclick="showToast('条款已读')">社区条款</a>·
+  <a onclick="showToast('匿名生效中')">隐私</a>
+</footer>
+
+<div class="mask" id="mask" onclick="if(event.target===this)closePost()">
+  <div class="modal">
+    <h3>发布新帖</h3>
+    <label>分区</label>
+    <select id="f-zone">
+      <option value="wall">校园匿名墙</option>
+      <option value="teacher">教师专区</option>
+      <option value="people">人物观察</option>
+      <option value="senior">高三专区</option>
+      <option value="treehole">匿名树洞</option>
+    </select>
+    <label>标题</label>
+    <input id="f-title" placeholder="一句话说清楚你在围观什么">
+    <label>正文</label>
+    <textarea id="f-body" placeholder="可以匿名，但请对得起自己的良心"></textarea>
+    <label>署名</label>
+    <input id="f-name" placeholder="留空则显示为「匿名用户」">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closePost()">取消</button>
+      <button class="btn btn-primary" onclick="submitPost()">发布</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 数据 ============ */
+var DATA = {
+  teacher: {
+    label: "教师专区", sub: "讨论老师的上课风格、奇怪习惯与趣事",
+    posts: [
+      {
+        id:"t1", badge:"teacher", head:"纳西妲 · 教师专区",
+        hot:true, title:"纳西妲老师真的什么都知道吗？？？",
+        meta:'<span class="av av-sm av-naxida">纳</span> 匿名学生 · 08:42 · 浏览 6,291 · 讨论 286 · 热度 9.8k',
+        body:"有人和我一样觉得纳西妲老师很神奇吗？\n\n上次我在办公室门口犹豫了半天，结果还没敲门，老师就问我是不是遇到了什么烦恼。\n\n而且她好像记得每个学生的名字。最可怕的是，她居然知道我上周考试没及格。\n\n老师到底是怎么知道的……",
+        cm:[
+          {n:"纳西妲",c:"呵呵，观察也是一种很有趣的学习方式哦。不过，考试成绩的事情，还是要靠你自己努力才行。",self:1},
+          {n:"匿名用户",c:"救命老师本人！！"},
+          {n:"匿名用户",c:"纳西妲老师会不会读心术？"},
+          {n:"纳西妲",c:"如果我真的会读心术，就不会有那么多需要向大家询问的问题了。",r:true,self:1},
+          {n:"匿名用户",c:"老师喜欢什么礼物？"},
+          {n:"纳西妲",c:"一本有趣的书，或者一段值得分享的故事，我都会很喜欢。",r:true,self:1},
+          {n:"温迪",c:"哎呀，老师的回答总是这么认真呢。"},
+          {n:"纳西妲",c:"温迪老师，你今天的课准备好了吗？",r:true,self:1},
+          {n:"温迪",c:"……",r:true},
+          {n:"匿名用户",c:"哈哈哈哈哈哈哈哈哈哈哈"}
+        ]
+      },
+      {
+        id:"t2", badge:"teacher", head:"温迪 · 教师专区",
+        title:"音乐老师是不是经常忘记自己还有课？？？",
+        meta:'<span class="av av-sm av-wendi">温</span> 匿名学生 · 12:16 · 浏览 8,452 · 讨论 417 · 热度 12.3k',
+        body:"不是，温迪老师。\n\n今天音乐课上到一半，他突然开始弹吉他，然后问我们：\n\n「你们觉得，如果把这首歌改成摇篮曲怎么样？」\n\n然后就真的开始唱摇篮曲了。我们班差点集体睡着。\n\n还有，他是不是经常在校园里喝饮料？上次我看见他拿着一杯饮料从教务处出来，结果被主任追着跑。",
+        cm:[
+          {n:"温迪",c:"哎呀呀，音乐本来就是自由的嘛！而且睡着也算是一种对音乐的认可？",self:1},
+          {n:"匿名用户",c:"老师你上次作业还没批完。"},
+          {n:"温迪",c:"咳咳，那个嘛……",r:true,self:1},
+          {n:"纳西妲",c:"温迪老师，记得今天下午来办公室一趟哦。"},
+          {n:"温迪",c:"啊哈哈……突然想起来我还有一首歌没写完！",r:true,self:1},
+          {n:"匿名用户",c:"老师你是不是又想逃？"},
+          {n:"温迪",c:"怎么会呢？我只是去寻找创作灵感！",r:true,self:1},
+          {n:"匿名用户",c:"温迪老师唱歌真的很好听。"},
+          {n:"温迪",c:"谢谢你！下次音乐课给你们准备特别节目！",r:true,self:1},
+          {n:"匿名用户",c:"求求了先把作业批完。"}
+        ]
+      }
+    ]
+  },
+
+  people: {
+    label: "人物观察", sub: "专门讨论某个角色的性格、行为与校园传闻",
+    posts: [
+      {
+        id:"p3", badge:"hot-p", head:"散兵 · 热门人物",
+        hot:true, title:"有人知道散兵到底是怎么想的吗？感觉他很难接近……",
+        meta:'<span class="av av-sm av-soldier">散</span> 匿名学生 · 14:03 · 浏览 15,820 · 讨论 592 · 热度 18.6k',
+        body:"最近因为社团活动认识了散兵。\n\n怎么说呢，他好像对谁都不太客气，说话也很直接。\n\n但是前几天我东西掉了，他居然帮我捡起来了。我道谢之后他还说「少自作多情，我只是嫌你挡路」。\n\n……这人到底什么性格啊？",
+        cm:[
+          {n:"散兵",c:"你们真的很闲。",self:1},
+          {n:"匿名用户",c:"本人出现了！！！！",r:true},
+          {n:"散兵",c:"很遗憾，我还没闲到能陪你们讨论这种无聊的话题。",r:true,self:1},
+          {n:"星",c:"他就是这样的！嘴上说不要，实际上还是会帮忙的！"},
+          {n:"散兵",c:"闭嘴。",r:true,self:1},
+          {n:"穹",c:"其实散兵同学人还不错。"},
+          {n:"散兵",c:"你也闭嘴。",r:true,self:1},
+          {n:"三月七",c:"但是他拍照的时候会不会笑呀？我好像从来没见过！"},
+          {n:"散兵",c:"不会。",r:true,self:1},
+          {n:"三月七",c:"那我下次一定要拍到！",r:true},
+          {n:"散兵",c:"你敢。",r:true,self:1},
+          {n:"匿名用户",c:"所以散兵同学有喜欢的东西吗？"},
+          {n:"散兵",c:"没有。",r:true,self:1},
+          {n:"匿名用户",c:"那讨厌的东西呢？",r:true},
+          {n:"散兵",c:"你们。",r:true,self:1}
+        ]
+      },
+      {
+        id:"p4", badge:"hot-p", head:"花火 · 热门人物",
+        hot:true, title:"花火是不是全校最会骗人的人？？？",
+        meta:'<span class="av av-sm av-furuhua">花</span> 匿名学生 · 16:27 · 浏览 19,328 · 讨论 721 · 热度 23.1k',
+        body:"我真的受不了了。\n\n今天花火同学说要带我去一个秘密地点。我跟着她绕了半个校园，最后到了小卖部。\n\n她说：\n\n「看，这就是我们今天的秘密基地。」\n\n然后让我请她喝饮料。我是不是被骗了？",
+        cm:[
+          {n:"花火",c:"哎呀，这怎么能叫骗人呢？这可是一次充满惊喜的冒险呀♡",self:1},
+          {n:"匿名用户",c:"那我的饮料钱呢？"},
+          {n:"花火",c:"就当是冒险经费好了。",r:true,self:1},
+          {n:"匿名用户",c:"花火同学是不是很喜欢恶作剧？"},
+          {n:"花火",c:"诶？你怎么会这么想呢？我明明是个诚实善良的好学生。",r:true,self:1},
+          {n:"散兵",c:"呵。"},
+          {n:"花火",c:"哎呀，这不是我们亲爱的散兵同学吗？怎么有空来关心我啦？"},
+          {n:"散兵",c:"我只是路过。",r:true,self:1},
+          {n:"花火",c:"路过也要留下爱的足迹嘛♡",r:true,self:1},
+          {n:"匿名用户",c:"花火，你到底有没有认真做过一件事？"},
+          {n:"花火",c:"当然有呀！比如认真地捉弄每一个人。",r:true,self:1},
+          {n:"匿名用户",c:"……",r:true},
+          {n:"温迪",c:"哈哈哈，这位同学还真是有趣呢。"},
+          {n:"花火",c:"温迪老师，下次也来陪花火玩吧？",r:true,self:1},
+          {n:"温迪",c:"这个嘛……要看是什么游戏咯。",r:true}
+        ]
+      },
+      {
+        id:"p5", badge:"hot-p", head:"浅漠 · 热门人物",
+        hot:true, title:"魔法奶龙社的社长是不是很神秘？以及她头上的草到底是什么？",
+        meta:'<span class="av av-sm av-qingmo">漠</span> 匿名学生 · 09:31 · 浏览 26,492 · 讨论 864 · 热度 31.7k',
+        body:"我最近发现一个很奇怪的现象。\n\n浅漠同学好像不怎么爱说话。平时表情也淡淡的，但是头上真的有一棵草！\n\n我本来以为是发饰，结果上次看见她头上的草动了一下。\n\n而且她好像很喜欢玩游戏？还有人说她是魔法奶龙社社长。请问这是一个怎样的人？",
+        cm:[
+          {n:"浅漠",c:"普通人。",self:1},
+          {n:"匿名用户",c:"普通人头上不会长草吧！！！",r:true},
+          {n:"浅漠",c:"你怎么知道。",r:true,self:1},
+          {n:"阿喜",c:"浅漠其实很好相处的！只是看起来比较冷而已！"},
+          {n:"浅漠",c:"嗯。",r:true,self:1},
+          {n:"安柒",c:"她有时候会突然消失，然后在活动室里打游戏。找她的时候记得先敲门。"},
+          {n:"浅漠",c:"你也可以直接进来。",r:true,self:1},
+          {n:"安柒",c:"上次你在睡觉。",r:true},
+          {n:"浅漠",c:"……",r:true,self:1},
+          {n:"匿名用户",c:"社长，你头上的草能吃吗？"},
+          {n:"浅漠",c:"不能。",r:true,self:1},
+          {n:"匿名用户",c:"能拔下来吗？",r:true},
+          {n:"浅漠",c:"你想试试？",r:true,self:1},
+          {n:"阿喜",c:"不可以拔！！！！",r:true},
+          {n:"安柒",c:"建议不要尝试。后果自负。",r:true},
+          {n:"匿名用户",c:"浅漠同学平时喜欢什么？"},
+          {n:"浅漠",c:"游戏。",r:true,self:1},
+          {n:"匿名用户",c:"还有呢？",r:true},
+          {n:"浅漠",c:"睡觉。",r:true,self:1},
+          {n:"匿名用户",c:"还有呢？",r:true},
+          {n:"浅漠",c:"不知道。",r:true,self:1},
+          {n:"花火",c:"哎呀，浅漠同学，要不要来戏剧社客串一下？我觉得你很适合出演神秘森林里的小妖精呢♡"},
+          {n:"浅漠",c:"不去。",r:true,self:1},
+          {n:"花火",c:"好冷淡！伤心了！",r:true},
+          {n:"散兵",c:"她只是懒得理你。"},
+          {n:"浅漠",c:"嗯。",r:true,self:1}
+        ]
+      }
+    ]
+  },
+
+  wall: {
+    label: "校园匿名墙", sub: "表白、吐槽、奇怪提问、目击记录",
+    posts: [
+      {
+        id:"w6", badge:"anon", head:"匿名投稿 · 校园目击",
+        title:"有人凌晨在教学楼看见散兵和花火了吗？",
+        meta:'匿名用户 · 昨天 23:48 · 讨论 193',
+        body:"昨天晚上我回学校拿东西，经过教学楼的时候看见散兵和花火站在一起。\n\n两个人好像在争论什么。花火一直在笑，散兵的表情看起来像是下一秒就要把她扔出去。\n\n请问他们关系很好吗？",
+        cm:[
+          {n:"花火",c:"哎呀，我们当然关系很好啦♡",self:1},
+          {n:"散兵",c:"谁跟你关系好。",self:1},
+          {n:"花火",c:"你看，他还记得我呢！",r:true,self:1},
+          {n:"匿名用户",c:"所以你们到底在干什么？"},
+          {n:"花火",c:"秘密。",r:true,self:1},
+          {n:"散兵",c:"她在找人帮忙搬东西。",r:true,self:1},
+          {n:"花火",c:"嘘——！",r:true,self:1},
+          {n:"浅漠",c:"我也看见了。"},
+          {n:"匿名用户",c:"？？？浅漠也在？",r:true},
+          {n:"浅漠",c:"我路过。",r:true,self:1},
+          {n:"安柒",c:"你们三个最好解释一下为什么教学楼门口的路灯坏了。"},
+          {n:"花火",c:"这可真是一个悲伤的故事。",r:true},
+          {n:"散兵",c:"跟我没关系。",r:true,self:1},
+          {n:"浅漠",c:"不是我。",r:true,self:1}
+        ]
+      },
+      {
+        id:"w7", badge:"vote", head:"校园投票 · 进行中",
+        title:"如果让你选一位同学当一天的临时班主任，你会选谁？",
+        meta:'校园论坛官方发起 · 参与 1,028 人 · 投票进行中',
+        body:"请投出你的一票。结果会实时显示在这里，每人限投一次。",
+        vote:{
+          q:"选择你的临时班主任",
+          opts:[
+            {t:"纳西妲", d:"温柔耐心，应该不会骂人", n:312},
+            {t:"温迪", d:"感觉一天都在摸鱼", n:87},
+            {t:"丹恒", d:"纪律和作业绝对有保障", n:268},
+            {t:"散兵", d:"不敢想象", n:54},
+            {t:"浅漠", d:"可能全班一起自习", n:196},
+            {t:"花火", d:"班级秩序将彻底消失", n:111}
+          ]
+        }
+      },
+      {
+        id:"w8", badge:"lost", head:"校园日常 · 失物招领",
+        title:"在活动室捡到一副眼镜，请问是谁的？",
+        meta:'匿名用户 · 15:20 · 讨论 68',
+        body:"在社团活动室附近捡到一副眼镜。\n\n镜框很好看，旁边还放着一本笔记本。有人丢东西了吗？",
+        cm:[
+          {n:"匿名用户",c:"这不会是散兵的吧？"},
+          {n:"散兵",c:"不是。",self:1},
+          {n:"匿名用户",c:"那会不会是丹恒的？",r:true},
+          {n:"丹恒",c:"不是我的。",self:1},
+          {n:"花火",c:"嘻嘻，说不定是某位神秘眼镜先生的呢？"},
+          {n:"浅漠",c:"我看见有人在找。"},
+          {n:"匿名用户",c:"谁？",r:true},
+          {n:"浅漠",c:"不知道。",r:true,self:1},
+          {n:"散兵",c:"那你说什么。",self:1},
+          {n:"浅漠",c:"路过。",r:true,self:1},
+          {n:"匿名用户",c:"……你们论坛到底怎么回事。"}
+        ]
+      }
+    ]
+  },
+
+  senior: {
+    label: "高三专区", sub: "高三生的生存现状与魔法奶龙社的三位高考选手",
+    posts: [
+      {
+        id:"s9", badge:"today", head:"今日热帖 · 全校围观",
+        hot:true, title:"高三魔法奶龙社社长疑似黑化？浅漠同学今天好像不太对劲。",
+        meta:'<span class="hot-flag">HOT · 全校围观</span> &nbsp; 匿名投稿 · 10:26 · 高三年级 · 浏览 38,921 · 讨论 1,284',
+        body:"今天经过高三教学楼，发现浅漠同学头上的草好像比平时更精神了。\n\n而且她今天居然主动和人打招呼。\n\n我本来以为她只是心情好，结果她问我：\n\n「你想不想体验一下魔法？」\n\n救命，她是不是终于要露出真面目了？",
+        cm:[
+          {n:"阿喜",c:"浅漠今天确实有点奇怪！她早上一直在笑！"},
+          {n:"安柒",c:"她今天把我的扳手藏起来了。"},
+          {n:"浅漠",c:"没有。",self:1},
+          {n:"安柒",c:"你头上的草下面露出来一截了。",r:true},
+          {n:"浅漠",c:"……",r:true,self:1},
+          {n:"匿名用户",c:"等等，浅漠同学笑起来是什么样的？"},
+          {n:"阿喜",c:"就是嘴角稍微翘起来一点点！很可爱！",r:true},
+          {n:"安柒",c:"然后开始说一些奇怪的话。",r:true},
+          {n:"花火",c:"哎呀呀，难道是传说中的第二人格？不如我们给她起个新名字吧♡"},
+          {n:"匿名用户",c:"叫什么？",r:true},
+          {n:"花火",c:"浅魔。",r:true,self:1},
+          {n:"散兵",c:"这名字倒是挺适合她的。"},
+          {n:"浅漠",c:"？",self:1},
+          {n:"散兵",c:"怎么，还不让说了？",r:true,self:1},
+          {n:"穹",c:"浅魔……听起来像某种隐藏 BOSS。"},
+          {n:"星",c:"我觉得可以出现在期末考试的最终关卡！"},
+          {n:"浅漠",c:"我会记住你们的。",self:1},
+          {n:"安柒",c:"社长，先把扳手还我。"},
+          {n:"浅漠",c:"浅魔没有扳手。",self:1},
+          {n:"阿喜",c:"哈哈哈哈哈哈哈哈哈哈哈哈哈！！"},
+          {n:"匿名用户",c:"完了，已经魔了。"}
+        ]
+      },
+      {
+        id:"s10", badge:"senior", head:"高三专区 · 学习日常",
+        title:"魔法奶龙社的三位高三生，请问你们真的有在学习吗？",
+        meta:'匿名用户 · 21:14 · 讨论 237',
+        body:"最近发现魔法奶龙社三个人经常在活动室待到很晚。\n\n浅漠在玩游戏，阿喜在研究一些奇怪的魔法，安柒在修东西。\n\n你们明年就要高考了啊！！！",
+        cm:[
+          {n:"安柒",c:"我在做社团设备维护，不要把我和她们两个混为一谈。"},
+          {n:"阿喜",c:"我有在学习的！今天还写了三页题目！"},
+          {n:"浅漠",c:"我也写了。",self:1},
+          {n:"匿名用户",c:"写了多少？"},
+          {n:"浅漠",c:"一道。",r:true,self:1},
+          {n:"安柒",c:"她写的是题目编号。",r:true},
+          {n:"浅漠",c:"……",r:true,self:1},
+          {n:"阿喜",c:"浅漠！！！！",r:true},
+          {n:"温迪",c:"青春真好啊，连学习都有这么多有趣的方式。"},
+          {n:"纳西妲",c:"不过，还是要注意劳逸结合哦。尤其是高三的同学们。"},
+          {n:"散兵",c:"建议先把游戏卸载了。"},
+          {n:"浅漠",c:"不建议。",self:1},
+          {n:"花火",c:"浅魔同学，花火支持你♡",self:1},
+          {n:"安柒",c:"你们两个都不要教她。"}
+        ]
+      }
+    ]
+  },
+
+  dossier: {
+    label: "人物档案", sub: "学生自发整理的角色印象",
+    dossiers: [
+      {
+        key:"soldier", name:"散兵", lv:"传闻级 · 高二 B 班",
+        tabs:["正式登记","棒球社"],
+        body:[
+          '<table class="dos-table"><tr><td>姓名</td><td>散兵</td></tr><tr><td>班级</td><td>高二 B 班</td></tr><tr><td>所属社团</td><td>棒球社（投手位）</td></tr><tr><td>身份标签</td><td>冷淡 · 直接 · 口是心非 · 话少</td></tr><tr><td>危险程度</td><td><span class="stars">★★★☆☆</span> &nbsp;<span style="color:var(--muted);font-weight:400">只针对接近者</span></td></tr><tr><td>可爱程度</td><td><span class="stars">★★☆☆☆</span> &nbsp;<span style="color:var(--muted);font-weight:400">本人否认此项评分</span></td></tr></table>',
+          '<div class="quote-box"><span class="qmark">"</span>少自作多情，我只是嫌你挡路。<span class="qmark">"</span></div>',
+          '<div class="cm"><span class="av av-sm av-baseball">理</span><div class="cm-body"><div class="cm-name">棒球社经理</div>他会配合故凝的节奏调整投球。故凝不在的那几场，他投得明显更急。</div></div>',
+          '<div class="cm"><span class="av av-sm av-guning">故</span><div class="cm-body"><div class="cm-name">故凝</div>……你们论坛是不是该管管了。</div></div>',
+          '<div class="cm"><span class="av av-sm av-soldier">散</span><div class="cm-body"><div class="cm-name">散兵</div>没有。</div></div>',
+          '<div class="cm"><span class="av av-sm av-furuhua">花</span><div class="cm-body"><div class="cm-name">花火</div>诶？我好像听到有人提到我？放心啦，我只是来凑热闹的♡</div></div>',
+          '<div class="cm"><span class="av av-sm av-axi">喜</span><div class="cm-body"><div class="cm-name">阿喜</div>所以散兵同学其实是会关心人的对吧！</div></div>',
+          '<div class="cm"><span class="av av-sm av-soldier">散</span><div class="cm-body"><div class="cm-name">散兵</div>你闭嘴。</div></div>'
+        ]
+      },
+      {
+        key:"qingmo", name:"浅漠 / 浅魔", lv:"特殊档案 · 高三年级",
+        tabs:["浅漠","浅魔"],
+        body:[
+          '<table class="dos-table"><tr><td>登记名</td><td>浅漠</td></tr><tr><td>称呼</td><td>浅魔（命名者：花火 / 认可者：散兵）</td></tr><tr><td>别称</td><td>魔法奶龙社社长 · 草系神秘生物 · 高三摸鱼选手</td></tr><tr><td>班级</td><td>高三 · 具体班级不明</td></tr><tr><td>身份标签</td><td>极简 · 神秘 · 草 · 游戏 · 睡觉</td></tr><tr><td>危险程度</td><td><span class="stars">★★☆☆☆</span> &nbsp;<span style="color:var(--muted);font-weight:400">暂无定论</span></td></tr><tr><td>可爱程度</td><td><span class="stars">★★★★☆</span> &nbsp;<span style="color:var(--muted);font-weight:400">据阿喜目测</span></td></tr></table>',
+          '<div class="quote-box"><span class="qmark">"</span>没有第二人格。<span class="qmark">"</span> —— 浅漠，被问及浅魔时</div>',
+          '<h4 style="margin:8px 0 4px;font-size:14px">校园争论</h4>',
+          '<p style="font-size:13.5px;color:#4a5a54">浅魔到底是不是浅漠的第二人格？</p>',
+          '<div class="cm"><span class="av av-sm av-furuhua">花</span><div class="cm-body"><div class="cm-name">花火</div>那你就是承认自己是浅魔咯？</div></div>',
+          '<div class="cm"><span class="av av-sm av-qingmo">漠</span><div class="cm-body"><div class="cm-name">浅漠</div>……</div></div>',
+          '<div class="cm"><span class="av av-sm av-axi">喜</span><div class="cm-body"><div class="cm-name">阿喜</div>哈哈哈哈哈哈哈哈！</div></div>',
+          '<div class="cm"><span class="av av-sm av-anqi">柒</span><div class="cm-body"><div class="cm-name">安柒</div>我申请把论坛关了。</div></div>',
+          '<h4 style="margin:14px 0 4px;font-size:14px">传闻</h4>',
+          '<div class="caps"><span>头顶常年生长不明草类</span><span>情绪与植物状态相关</span><span>擅长以极简文字结束对话</span><span>偶尔出现「魔化」状态</span><span>曾用一道题的题号证明完成作业</span></div>',
+          '<h4 style="margin:14px 0 4px;font-size:14px">应对方式</h4>',
+          '<p style="font-size:13.5px;color:#4a5a54">不要随意触碰头顶植物。不要在她打游戏时催促。不要轻易相信她说的「我没魔」。</p>'
+        ]
+      },
+      {
+        key:"furuhua", name:"花火", lv:"传闻级 · 高一年级",
+        tabs:["正式登记"],
+        body:[
+          '<table class="dos-table"><tr><td>姓名</td><td>花火</td></tr><tr><td>班级</td><td>不明（自称「在哪儿都能找到乐趣」）</td></tr><tr><td>所属社团</td><td>戏剧社（活跃度：存疑）</td></tr><tr><td>身份标签</td><td>恶作剧 · 惊喜 · 甜言蜜语 · ♡</td></tr><tr><td>危险程度</td><td><span class="stars">★★★★☆</span></td></tr><tr><td>可爱程度</td><td><span class="stars">★★★★★</span></td></tr></table>',
+          '<div class="quote-box"><span class="qmark">"</span>这怎么能叫骗人呢？这可是一次充满惊喜的冒险呀♡<span class="qmark">"</span></div>',
+          '<p style="font-size:13.5px;color:#5a6a64">已知事迹：小卖部「秘密基地」、戏剧社招募（未成功）、路灯事件（否认参与）。</p>',
+          '<div class="submit-box" style="margin-top:12px"><h4>投稿一条关于花火的传闻</h4><textarea placeholder="写下你被整的经历，或你目击到的可疑行为"></textarea><div class="submit-bar"><button class="btn btn-primary" onclick="showToast(\'已收录到花火档案\')">投稿</button></div></div>'
+        ]
+      }
+    ]
+  },
+
+  treehole: {
+    label: "匿名树洞", sub: "投稿、烦恼、秘密。这里没人认识你",
+    posts: [
+      {
+        id:"th1", badge:"anon", head:"树洞 · 投稿", noCount:true,
+        title:"我喜欢的人好像也喜欢我，但我不敢确认。",
+        meta:'匿名投稿 · 昨天 23:02',
+        body:"我们每天一起走回家，她会在便利店帮我拿一瓶饮料。\n\n但我不确定这算不算喜欢。\n\n有没有人能告诉我，什么才是明确的信号？",
+        cm:[
+          {n:"匿名用户",c:"帮你拿饮料已经很明确了，别犹豫了。"},
+          {n:"阿喜",c:"去问嘛去问嘛！魔法奶龙社会为你加油的！"},
+          {n:"纳西妲",c:"如果担心会破坏现状，可以先试着多创造一些两个人的时间。"},
+          {n:"匿名用户",c:"可是万一她只是习惯了呢？"},
+          {n:"花火",c:"那就让她习惯一辈子呀♡"}
+        ]
+      },
+      {
+        id:"th2", badge:"anon", head:"树洞 · 烦恼", noCount:true,
+        title:"考试考砸了，不敢跟家里说。",
+        meta:'匿名投稿 · 今天 07:15',
+        body:"我知道自己这段时间确实没怎么学。\n\n但现在面对爸妈的时候，心里特别难受。\n\n想说又不知道从哪开口。",
+        cm:[
+          {n:"纳西妲",c:"承认自己的失落，其实已经是改变的开始。要不要先从一次坦诚的对话试起？"},
+          {n:"匿名用户",c:"先承认结果，再告诉他们你打算怎么做，比一直躲着要好。"},
+          {n:"温迪",c:"哎呀，谁还没有考砸的时候呢。下次我们一起补回来？"}
+        ]
+      }
+    ]
+  },
+
+  sighting: {
+    label: "校园目击", sub: "记录角色的奇怪行为",
+    posts: [
+      {
+        id:"sg1", badge:"anon", head:"校园目击 · 投稿",
+        title:"凌晨一点在操场看见有人独自打棒球。",
+        meta:'匿名用户 · 今天 02:14 · 讨论 76',
+        body:"我睡不着去操场散步，看见有人一个人在投球。\n\n看身形有点像散兵，但不确定。\n\n重点是——他在跟空气说话，好像在讨论战术。",
+        cm:[
+          {n:"棒球社经理",c:"那是战术复盘。散兵同学习惯打完一场之后自己再想一遍。"},
+          {n:"匿名用户",c:"……那他为什么对着空气说话？"},
+          {n:"棒球社经理",c:"因为他假设对手站在那里。请不要打扰他。"},
+          {n:"散兵",c:"。",self:1}
+        ]
+      },
+      {
+        id:"sg2", badge:"anon", head:"校园目击 · 投稿",
+        title:"活动室门口听见里面有打游戏的声音，但是没人应门。",
+        meta:'匿名用户 · 昨天 19:40 · 讨论 42',
+        body:"敲门敲了五分钟，里面有音效但就是没人开门。\n\n后来安柒来了，她说「她睡着了，别管她」。",
+        cm:[
+          {n:"安柒",c:"我没有别的意思。只是那时候敲门确实没意义。"},
+          {n:"阿喜",c:"浅漠睡着的样子很乖的！就是头上的草会慢慢倒下去。"},
+          {n:"匿名用户",c:"草会倒下去？？？"},
+          {n:"阿喜",c:"嗯！像向日葵晚上收起来那样！"}
+        ]
+      }
+    ]
+  },
+
+  office: {
+    label: "老师办公室", sub: "教师相关趣闻",
+    posts: [
+      {
+        id:"o1", badge:"teacher", head:"老师办公室 · 趣闻",
+        title:"温迪老师又被叫去办公室了，原因是……",
+        meta:'匿名用户 · 今天 09:48 · 讨论 104',
+        body:"这次不是因为没批作业。\n\n是因为他在办公室里用吉他给盆栽弹催眠曲。\n\n纳西妲老师当时就在旁边喝茶，全程没有阻止，只是在本子上记了什么。",
+        cm:[
+          {n:"温迪",c:"那盆绿萝确实看起来很困。"},
+          {n:"纳西妲",c:"我只是做了一次课堂观察记录而已。"},
+          {n:"匿名用户",c:"老师你为什么要记下来啊？？"},
+          {n:"纳西妲",c:"因为很有趣。也许以后可以写一篇关于「教师行为多样性」的小论文。"},
+          {n:"温迪",c:"……我可以申请成为研究对象吗？"}
+        ]
+      }
+    ]
+  },
+
+  voting: {
+    label: "全校投票", sub: "各种奇怪议题，结果可能改变不了任何事",
+    posts: [
+      {
+        id:"v2", badge:"vote", head:"校园投票 · 已结束",
+        title:"校园里最可疑的存在是谁？",
+        meta:'校园论坛官方发起 · 参与 2,417 人 · 已结束',
+        vote:{
+          q:"谁身上藏着最多未解之谜？", done:true,
+          opts:[
+            {t:"浅漠头上的草", d:"会动、会倒、会精神", n:892},
+            {t:"散兵为什么总在操场", d:"投球、说话、复盘", n:654},
+            {t:"花火的饮料经费", d:"来源至今不明", n:501},
+            {t:"温迪老师的作业", d:"是否真实存在", n:370}
+          ]
+        }
+      }
+    ]
+  },
+
+  explain: {
+    label: "谁来解释一下", sub: "专门讨论离谱事件",
+    posts: [
+      {
+        id:"e1", badge:"anon", head:"谁来解释一下 · 离谱事件",
+        title:"有人能解释一下教学楼门口的路灯为什么会坏吗？",
+        meta:'匿名用户 · 昨天 23:55 · 讨论 128',
+        body:"路灯是好的。然后它就坏了。\n\n第二天早上看见安柒在修，旁边散兵和花火各站一边，浅漠坐在台阶上打游戏。\n\n请问这是一场事故，还是一场活动？",
+        cm:[
+          {n:"安柒",c:"是设备维护。"},
+          {n:"散兵",c:"不是我。",self:1},
+          {n:"花火",c:"你猜♡"},
+          {n:"浅漠",c:"我没有看到。",self:1},
+          {n:"匿名用户",c:"你们四个的回答合在一起反而更可疑了。"},
+          {n:"安柒",c:"路灯现在能亮了。这就是最好的解释。"}
+        ]
+      }
+    ]
+  }
+};
+
+/* ============ 渲染 ============ */
+var NAV = ["teacher","people","wall","senior","dossier","treehole","sighting","office","voting","explain"];
+
+function nameKey(n){ return n.replace(/[^a-zA-Z0-9一-龥]/g,""); }
+function avatar(n,lg){
+  var k = nameKey(n), cls = "av";
+  if(lg) cls += " av-lg";
+  var map = {"纳西妲":"naxida","温迪":"wendi","散兵":"soldier","花火":"furuhua","浅漠":"qingmo",
+    "故凝":"guning","阿喜":"axi","安柒":"anqi","星":"xing","穹":"xiong","三月七":"sanyue",
+    "丹恒":"danheng","棒球社经理":"baseball","论坛官方":"official"};
+  if(map[k]) cls += " av-" + map[k];
+  if(n === "匿名用户") cls += " av-anon";
+  var ch = (n === "论坛官方") ? "官" : (n.length <= 2 ? n : n.charAt(0));
+  return '<span class="'+cls+'">' + ch + '</span>';
+}
+function bubble(n,txt){
+  var k = nameKey(n), map = {"纳西妲":"naxida","温迪":"wendi","散兵":"soldier","花火":"furuhua","浅漠":"qingmo",
+    "故凝":"guning","阿喜":"axi","安柒":"anqi","星":"xing","穹":"xiong","三月七":"sanyue",
+    "丹恒":"danheng","棒球社经理":"baseball","论坛官方":"official"};
+  var c = map[k] ? "b-" + map[k] : "";
+  return '<span class="b '+c+'">'+ txt +'</span>';
+}
+function renderCm(list){
+  var h = "";
+  list.forEach(function(m){
+    var self = m.self ? ' <span class="n-self">本人</span>' : "";
+    var rp = m.r ? " reply" : "";
+    h += '<div class="cm'+rp+'">'+ avatar(m.n) +'<div class="cm-body"><div class="cm-name">'+m.n+self+'</div>'+ bubble(m.n,m.c) +'</div></div>';
+  });
+  return h;
+}
+function renderVote(v,pid){
+  var total = 0; v.opts.forEach(function(o){total+=o.n});
+  var h = '<div class="vote-list" data-total="'+total+'">';
+  v.opts.forEach(function(o,i){
+    var p = total ? Math.round(o.n/total*100) : 0;
+    h += '<div class="vote-opt'+(v.done?" done":"")+'" data-i="'+i+'" data-pid="'+pid+'" onclick="doVote(this)">'
+       + '<div class="bar-fill"></div><div class="vrow">'
+       + '<span class="vtxt"><b>'+o.t+'</b> — '+o.d+'</span>'
+       + '<span class="vnum"><span class="vc">'+o.n+'</span> 票 · <span class="vp">'+p+'</span>%</span>'
+       + '</div></div>';
+  });
+  h += '</div><p style="font-size:12px;color:var(--muted);margin-top:8px">累计 '+total+' 人参与'+(v.done?" · 投票已结束":" · 每人限投一次")+'</p>';
+  return h;
+}
+function renderPost(p,zone){
+  var cmHtml = p.vote ? renderVote(p.vote,p.id) : renderCm(p.cm||[]);
+  var cnt = p.vote ? "" : (p.noCount ? "" : '<span class="toggle" onclick="toggleCard(this)">展开评论区（'+(p.cm||[]).length+' 条）</span>');
+  return ''
+    + '<article class="card" data-id="'+p.id+'">'
+    + '<div class="card-head"><span class="badge '+p.badge+'">'+p.head+'</span>'+(p.hot?'<span class="hot-flag">热</span>':'')+'</div>'
+    + '<div class="card-title" onclick="toggleCard(this)">'+p.title+'</div>'
+    + '<div class="meta">'+p.meta+'</div>'
+    + '<div class="body excerpt">'+p.body+'</div>'
+    + '<div class="comments">'+cmHtml+'</div>'
+    + cnt
+    + '</article>';
+}
+function renderDossier(d){
+  var tabs = "";
+  d.tabs.forEach(function(t,i){
+    tabs += '<button class="dos-tab'+(i===0?" active":"")+'" data-i="'+i+'" onclick="switchDos(this,\''+d.key+'\')">'+t+'</button>';
+  });
+  var first = d.name.split("/")[0];
+  var ini = first.charAt(0);
+  return ''
+    + '<div class="dossier" data-key="'+d.key+'">'
+    + '<div class="dos-head">'
+    + '<span class="av av-lg av-'+d.key+'">'+ini+'</span>'
+    + '<div><div class="dos-name">'+d.name+'</div><div style="font-size:12px;color:var(--muted)">'+d.lv+'</div></div>'
+    + '<div class="dos-tabs">'+tabs+'</div>'
+    + '</div>'
+    + '<div class="dos-body">'+d.body.join("")+'</div>'
+    + '<div class="dos-foot"><span>由校园论坛用户自发整理 · 不代表校方立场</span><span>'+ (180+Math.floor(Math.random()*600)) +' 人认为有用</span></div>'
+    + '</div>';
+}
+function renderZone(zone){
+  var d = DATA[zone], h = "";
+  if(zone === "dossier"){
+    h += '<div class="zone-head"><h2>'+d.label+'</h2><p>'+d.sub+'</p></div>';
+    d.dossiers.forEach(function(x){ h += renderDossier(x); });
+    return h;
+  }
+  h += '<div class="zone-head"><h2>'+d.label+'</h2><p>'+d.sub+'</p></div>';
+  if(d.posts.length === 0){
+    h += '<div class="card"><div class="body" style="text-align:center;color:var(--muted)">这个分区还很安静……来发第一帖？</div></div>';
+  }
+  d.posts.forEach(function(p){ h += renderPost(p,zone); });
+  if(zone === "treehole"){
+    h += '<div class="submit-box"><h4>写下你的秘密，这里没人认识你</h4><textarea placeholder="说出来会轻松一点"></textarea><div class="submit-bar"><button class="btn btn-primary" onclick="showToast(\'已匿名发布到树洞\')">匿名发布</button></div></div>';
+  }
+  return h;
+}
+
+/* ============ 交互 ============ */
+var cur = "teacher";
+function go(zone){
+  if(!DATA[zone]) return;
+  cur = zone;
+  document.querySelectorAll(".nav-item").forEach(function(b){
+    b.classList.toggle("active", b.dataset.go === zone);
+  });
+  var m = document.getElementById("main");
+  m.style.opacity = "0";
+  setTimeout(function(){
+    try{
+      m.innerHTML = renderZone(zone);
+    }catch(e){
+      m.innerHTML = '<div class="card"><div class="body" style="color:#b35">加载这个分区时出了点问题，刷新试试？</div></div>';
+    }
+    m.style.opacity = "1";
+    if(zone === "voting" || zone === "wall") animateVotes(m);
+    window.scrollTo({top:0,behavior:"smooth"});
+  }, 120);
+}
+function toggleCard(el){
+  var card = el.closest(".card");
+  if(!card.classList.contains("open")){
+    card.classList.add("open");
+    var c = card.querySelector(".comments");
+    var n = (c.querySelectorAll(".cm").length) || (c.querySelectorAll(".vote-opt").length);
+    card.querySelector(".toggle").textContent = "收起（" + n + " 条）";
+    if(card.querySelector(".vote-opt")) animateVotes(card);
+  } else {
+    card.classList.remove("open");
+    var t = card.querySelector(".toggle");
+    if(t){
+      var num = card.querySelectorAll(".comments > .cm, .comments > .vote-list").length;
+      t.textContent = "展开评论区（" + num + " 条）";
+    }
+  }
+}
+function switchDos(btn,key){
+  var dos = btn.closest(".dossier");
+  dos.querySelectorAll(".dos-tab").forEach(function(t){ t.classList.remove("active"); });
+  btn.classList.add("active");
+  showToast("已切换到「"+btn.textContent+"」");
+}
+function doVote(el){
+  if(el.classList.contains("done")) return;
+  var box = el.closest(".vote-list");
+  if(box.dataset.voted === "1"){ showToast("你已经投过一票了"); return; }
+  box.dataset.voted = "1";
+  box.querySelectorAll(".vote-opt").forEach(function(o){ o.classList.add("done"); });
+  var i = +el.dataset.i, span = el.querySelector(".vc"), pspan = el.querySelector(".vp");
+  var curN = +span.textContent;
+  span.textContent = curN + 1;
+  el.style.borderColor = "var(--brand)";
+  el.style.background = "#eaf5ef";
+  el.querySelector(".vrow").style.fontWeight = "700";
+  animateVotes(box.parentElement);
+  showToast("投票成功");
+}
+function animateVotes(root){
+  var scope = root.querySelector ? root : document;
+  scope.querySelectorAll(".vote-opt").forEach(function(o){
+    var p = +o.querySelector(".vp").textContent;
+    var fill = o.querySelector(".bar-fill");
+    setTimeout(function(){ fill.style.width = p + "%"; }, 60);
+  });
+}
+function openPost(){ document.getElementById("mask").classList.add("show"); }
+function closePost(){ document.getElementById("mask").classList.remove("show"); }
+function submitPost(){
+  var z = document.getElementById("f-zone").value;
+  var t = document.getElementById("f-title").value.trim();
+  var b = document.getElementById("f-body").value.trim();
+  if(!t){ showToast("标题还是要写一写的"); return; }
+  if(!b){ showToast("正文空着不太好吧"); return; }
+  var name = document.getElementById("f-name").value.trim() || "匿名用户";
+  var post = {
+    id:"new"+Date.now(), badge:"anon",
+    head:(DATA[z]&&DATA[z].label?DATA[z].label:"校园匿名墙")+" · 新帖",
+    title:t, meta:name+' · 刚刚 · 浏览 1 · 讨论 0',
+    body:b, cm:[{n:name,c:"楼主先顶一下。",self:1}]
+  };
+  if(!DATA[z]){ showToast("该分区暂不支持发帖"); return; }
+  DATA[z].posts.unshift(post);
+  document.getElementById("f-title").value="";
+  document.getElementById("f-body").value="";
+  document.getElementById("f-name").value="";
+  closePost();
+  if(cur !== z) go(z); else document.getElementById("main").innerHTML = renderZone(z);
+  showToast("发布成功，已置顶到本分区");
+}
+var toastTimer;
+function showToast(msg){
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 1900);
+}
+
+/* ============ 启动 ============ */
+document.addEventListener("DOMContentLoaded",function(){
+  document.querySelectorAll(".nav-item").forEach(function(b){
+    b.addEventListener("click",function(){ go(b.dataset.go); });
+  });
+  document.getElementById("main").innerHTML = renderZone("teacher");
+  document.getElementById("main").style.transition = "opacity .15s";
+  animateVotes(document.getElementById("main"));
+});
+document.addEventListener("keydown",function(e){
+  if(e.key === "Escape") closePost();
+});
+</script>
+</body>
+</html>

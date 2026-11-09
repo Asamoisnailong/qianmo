@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>人物卡片 · 三棱镜</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Long+Cang&family=Liu+Jian+Mao+Cao&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; -webkit-text-size-adjust: 100%; }
+body { background: #f5f5f5; font-family: sans-serif; overflow: hidden; overscroll-behavior: none; }
+
+/* ===== 第一屏 ===== */
+.fullscreen-img {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    z-index: 10; cursor: pointer; transition: opacity 0.5s ease;
+}
+.fullscreen-img.hidden { opacity: 0; pointer-events: none; }
+.img-wrapper {
+    position: relative; width: 340px; height: 340px;
+    display: flex; align-items: center; justify-content: center;
+}
+.img-wrapper img {
+    width: 100%; height: 100%; object-fit: contain; object-position: center;
+    border-radius: 12px; position: relative; z-index: 2;
+}
+.rotating-frame {
+    position: absolute; top: -15px; left: -15px; right: -15px; bottom: -15px;
+    border: 2px dashed #ccc; border-radius: 16px; animation: rotate 10s linear infinite;
+}
+.frame-counter { animation-direction: reverse; top: -25px; left: -25px; right: -25px; bottom: -25px; border-color: #ddd; }
+@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.dust-layer {
+    position: absolute; width: 100%; height: 100%;
+    background-image: radial-gradient(#ccc 1px, transparent 1px); background-size: 20px 20px;
+    opacity: 0.3; pointer-events: none;
+}
+
+/* ===== 第二屏卡片 ===== */
+.card-container {
+    display: none; justify-content: center; align-items: center;
+    height: 100vh; height: 100dvh; padding: 60px 12px;
+    overflow-y: auto; overflow-x: clip; -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+}
+.card-container.show { display: flex; }
+.card {
+    width: 840px; background: #fff; border-radius: 20px;
+    padding: 22px 38px 30px 34px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    display: flex; flex-wrap: wrap; gap: 26px 0;
+}
+
+/* ---- 左面板 ---- */
+.left-panel {
+    width: 250px; margin-right: 24px; position: relative;
+    will-change: transform; display: flex; flex-direction: column; align-items: center;
+}
+.avatar-container {
+    position: relative; width: 100%; aspect-ratio: 1 / 1;
+    border-radius: 12px; overflow: visible; flex-shrink: 0;
+}
+.avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; display: block; }
+.avatar-frame {
+    position: absolute; inset: 0; border: 2px solid rgba(0,0,0,0.25);
+    border-radius: 12px; pointer-events: none; z-index: 5;
+}
+.avatar-frame.f1 { animation: rotate 14s linear infinite; }
+.avatar-frame.f2 { animation: rotate 18s linear infinite reverse; border-color: rgba(0,0,0,0.15); }
+
+.decor-overlay {
+    position: absolute; top: -23%; left: 0; width: 100%; height: 48%;
+    z-index: 10; pointer-events: none; animation: float 3s ease-in-out infinite;
+}
+.decor-overlay img {
+    width: 100%; height: 100%; object-fit: contain;
+    border: 1px solid rgba(190,0,0,0.45); border-radius: 10px;
+    box-shadow: 0 0 0 1px rgba(130,0,0,0.35), inset 0 0 6px rgba(160,0,0,0.15);
+    filter: drop-shadow(1px 1px 3px rgba(120,0,0,0.15));
+}
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+.side-decor {
+    position: absolute; right: 99%; top: 0; height: 96%; width: auto;
+    margin-right: -38px; pointer-events: none; z-index: 10; animation: floatSide 4s ease-in-out infinite;
+}
+.side-decor img {
+    height: 98%; width: auto; object-fit: contain; display: block;
+    border: 1px solid rgba(190,0,0,0.45); border-radius: 10px;
+    box-shadow: 0 0 0 1px rgba(130,0,0,0.35), inset 0 0 6px rgba(160,0,0,0.15);
+}
+@keyframes floatSide { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+/* ===== 三个白色透明方块 ===== */
+.block-row { display: flex; gap: 16px; width: 100%; margin-top: 20px; justify-content: center; flex-shrink: 0; }
+.frost-block {
+    flex: 1; height: 60px; border-radius: 14px;
+    background: rgba(255,255,255,0.68); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(230,225,218,0.6); box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+    cursor: pointer; transition: all 0.25s ease; user-select: none; -webkit-tap-highlight-color: transparent;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+}
+.frost-block span {
+    position: relative; z-index: 2; font-family: 'Liu Jian Mao Cao', cursive;
+    font-size: 34px; color: #3a2a1a; letter-spacing: 2px; line-height: 1;
+    text-shadow: 0 1px 2px rgba(120,90,60,0.12);
+}
+.frost-block::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(255,252,246,0.6), transparent 70%);
+    pointer-events: none;
+}
+.frost-block:hover { background: rgba(255,251,243,0.82); border-color: rgba(205,192,178,0.7); transform: scale(1.03); box-shadow: 0 6px 20px rgba(110,85,60,0.08); }
+.frost-block:active { transform: scale(0.93); }
+
+/* ===== 竖排状态栏：四个长方形 ===== */
+.status-bar { width: 756px; max-width: 100%; margin-top: 20px; flex-shrink: 0; }
+.status-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.status-head h3 {
+    margin: 0; font-family: 'Long Cang', cursive; font-size: 22px; color: #3d322a;
+    letter-spacing: 2px; line-height: 1; font-weight: 400;
+}
+.status-head .bar-line { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(163,142,124,0.4), transparent); }
+
+.status-viewport { width: 100%; }
+.status-viewport::-webkit-scrollbar { display: none; }
+.status-track {
+    display: flex; flex-direction: column; gap: 10px; width: 100%; padding-right: 0;
+}
+.status-card {
+    width: 100%; min-height: 52px; border-radius: 12px; padding: 0; overflow: hidden;
+    background: rgba(255,255,255,0.72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(230,225,218,0.65); box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+    display: flex; align-items: stretch; cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.status-card:hover { transform: translateX(4px); border-color: rgba(205,192,178,0.75); box-shadow: 0 8px 22px rgba(110,85,60,0.08); background: rgba(255,251,243,0.85); }
+.status-card:active { transform: scale(0.99); }
+.status-date {
+    flex: 0 0 auto; width: 56px; font-family: 'Long Cang', cursive; font-size: 22px;
+    color: #fff; letter-spacing: 2px; line-height: 1; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, rgba(120,96,74,0.75), rgba(163,142,124,0.75));
+    padding: 6px 0; writing-mode: vertical-rl; text-orientation: upright;
+}
+.status-text {
+    display: none;
+}
+.status-dots { display: none; }
+
+/* ---- 右面板 ---- */
+.right-panel { flex: 1; min-width: 280px; }
+.top-section { display: flex; align-items: flex-start; gap: 0; margin: -4px 0 22px; }
+.circle-img {
+    width: 74px; height: 74px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+    background: #f0f0f0; display: flex; align-items: center; justify-content: center;
+}
+.circle-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.circle-img.right { margin-left: auto; }
+.chat-area { flex: 1; padding: 0 10px; display: flex; flex-direction: column; gap: 5px; max-width: 210px; min-width: 0; }
+.bubble { max-width: 80%; padding: 7px 14px; border-radius: 18px; font-size: 15px; line-height: 1.4; word-break: break-word; }
+.bubble.me { background: #95ec69; color: #000; align-self: flex-end; border-bottom-right-radius: 4px; }
+.bubble.other { background: #fff; color: #000; border: 1px solid #ddd; align-self: flex-start; border-bottom-left-radius: 4px; }
+
+.info-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+.info-item { background: #fafafa; padding: 8px 16px; border-radius: 8px; font-size: 20px; color: #333; border-left: 4px solid #bbb; font-family: 'Long Cang', cursive; }
+
+.slogan {
+    font-size: 40px; color: #1a1a1a; letter-spacing: 8px; line-height: 1.4;
+    writing-mode: vertical-lr; font-family: 'Long Cang', cursive;
+    margin-left: auto; margin-top: -340px; height: 370px; opacity: 0.50;
+    animation: floatSlogan 3s ease-in-out infinite;
+}
+@keyframes floatSlogan { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* ===== 模态弹窗 ===== */
+.modal-mask {
+    display: none; position: fixed; inset: 0; background: rgba(30,25,20,0.35);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    z-index: 999; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s ease;
+}
+.modal-mask.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-card {
+    width: 440px; max-width: 88vw; background: rgba(253,249,241,0.77);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border-radius: 28px; padding: 36px 34px 30px; border: 1px solid rgba(215,198,176,0.35);
+    box-shadow: 0 20px 56px rgba(50,35,20,0.18); position: relative;
+    animation: modalPop 0.33s cubic-bezier(0.34, 1.53, 0.63, 1);
+}
+@keyframes modalPop { from { transform: scale(0.91) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+.modal-close {
+    position: absolute; top: 14px; right: 18px; width: 32px; height: 32px; border: none;
+    background: rgba(165,138,118,0.18); border-radius: 50%; font-size: 20px; line-height: 32px;
+    text-align: center; color: #4a3a2a; cursor: pointer; transition: 0.2s; font-family: serif; padding: 0;
+}
+.modal-close:hover { background: rgba(162,137,117,0.37); transform: rotate(90deg); }
+.modal-title { font-family: 'Long Cang', cursive; font-size: 32px; color: #2a221a; margin-bottom: 10px; letter-spacing: 4px; border-bottom: 1px dashed rgba(163,142,124,0.39); padding-bottom: 10px; }
+.modal-body { font-size: 18px; line-height: 1.7; color: #3d322a; font-family: 'Long Cang', cursive; padding: 8px 0 4px; letter-spacing: 0.5px; white-space: pre-wrap; }
+
+/* ===== 歌词播放器（歌曲软件风格） ===== */
+.lyric-player {
+    width: 100%; margin-top: 18px; flex-shrink: 0;
+    border-radius: 16px; padding: 16px 18px 14px;
+    background: rgba(255,255,255,0.42);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.6);
+    box-shadow: 0 6px 24px rgba(120,96,70,0.06);
+    position: relative; overflow: hidden;
+}
+.lyric-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.lyric-head .track-name {
+    font-family: 'Long Cang', cursive; font-size: 20px;
+    color: rgba(70,60,52,0.72); letter-spacing: 2px; line-height: 1; margin: 0; font-weight: 400;
+    text-shadow: 0 0 6px rgba(255,255,255,0.6);
+}
+.lyric-head .bar-line { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(180,170,158,0.45), transparent); }
+.lyric-stage {
+    position: relative; height: 150px; overflow: hidden;
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 28%, #000 72%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 28%, #000 72%, transparent 100%);
+}
+.lyric-tape { position: absolute; left: 0; right: 0; top: 0; will-change: transform; }
+.lyric-line {
+    height: 30px; line-height: 30px; text-align: center; white-space: nowrap;
+    font-size: 14px; color: rgba(120,108,94,0.3); letter-spacing: 0.4px;
+    transition: color 0.5s ease, text-shadow 0.5s ease, transform 0.5s ease;
+    font-family: 'Long Cang', cursive;
+}
+.lyric-line.active {
+    color: rgba(80,68,58,0.9); font-size: 17px;
+    text-shadow: 0 0 4px rgba(255,255,255,0.85), 0 0 12px rgba(255,238,210,0.6), 0 1px 18px rgba(230,210,180,0.45);
+    transform: scale(1.02);
+}
+.lyric-progress { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.lyric-progress .time { font-size: 11px; color: rgba(120,108,94,0.6); letter-spacing: 0.5px; line-height: 1; }
+.lyric-progress .track {
+    flex: 1; height: 3px; border-radius: 3px; background: rgba(180,170,158,0.3); overflow: hidden;
+}
+.lyric-progress .fill {
+    height: 100%; width: 0; border-radius: 3px;
+    background: linear-gradient(90deg, rgba(200,180,150,0.9), rgba(230,210,180,0.7)); transition: width 0.2s linear;
+}
+.lyric-player.playing::after {
+    content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(210,190,160,0.65), transparent);
+    animation: lyricShine 3.6s ease-in-out infinite;
+}
+@keyframes lyricShine { 0% { transform: translateX(-40%); } 100% { transform: translateX(40%); } }
+.lyric-controls { display: flex; justify-content: center; gap: 14px; margin-top: 10px; }
+.lyric-btn {
+    border: none; background: rgba(255,255,255,0.45); border-radius: 20px;
+    padding: 5px 16px; font-size: 12px; color: rgba(80,68,58,0.85); cursor: pointer;
+    letter-spacing: 1px; transition: 0.2s; font-family: 'Long Cang', cursive;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.lyric-btn:hover { background: rgba(255,255,255,0.7); }
+
+.cover-wrap { margin-top: 14px; text-align: center; }
+.cover-cap {
+    font-family: 'Long Cang', cursive; font-size: 14px; color: #a18b72;
+    letter-spacing: 2px; margin-bottom: 8px;
+}
+.cover-img {
+    display: block; max-width: 100%; height: auto; margin: 0 auto;
+    border-radius: 12px; border: 1px solid rgba(215,198,176,0.5);
+    box-shadow: 0 6px 20px rgba(110,85,60,0.1); background: #faf6ef;
+    min-height: 120px; object-fit: contain;
+}
+.cover-img.hidden { display: none; }
+.cover-fallback {
+    display: none; padding: 24px 16px; border-radius: 12px;
+    border: 1px dashed rgba(163,142,124,0.4); background: rgba(250,246,239,0.7);
+    color: #a18b72; font-size: 13px; text-align: center; line-height: 1.6;
+}
+.cover-fallback.show { display: block; }
+
+/* ================================================
+   平板 / 手机：保持「横屏」左右分栏，整体等比缩小
+   ================================================ */
+@media (max-width: 760px) {
+    .img-wrapper { width: min(340px, 72vw); height: min(340px, 72vw); }
+    .rotating-frame { top: -10px; left: -10px; right: -10px; bottom: -10px; }
+    .frame-counter { top: -18px; left: -18px; right: -18px; bottom: -18px; }
+
+    .card-container { padding: 16px 14px 24px; align-items: center; }
+    .card { width: 94vw; max-width: 620px; padding: 20px 18px 24px; border-radius: 16px; flex-wrap: nowrap; flex-direction: row; align-items: flex-start; gap: 0; }
+
+    .left-panel { width: 32%; max-width: 160px; min-width: 96px; margin-right: 20px; }
+    .right-panel { flex: 1 1 0; min-width: 0; }
+
+    .top-section { margin-bottom: 12px; }
+    .circle-img { width: 46px; height: 46px; }
+    .chat-area { max-width: none; padding: 0 6px; gap: 4px; }
+    .bubble { font-size: 11px; padding: 4px 9px; border-radius: 12px; }
+
+    .info-list { gap: 7px; margin-bottom: 10px; }
+    .info-item { font-size: 14px; padding: 6px 10px; border-radius: 7px; line-height: 1.35; }
+
+    .slogan { writing-mode: vertical-lr; font-size: 22px; letter-spacing: 4px; line-height: 1.2; margin: -260px 0 0 auto; height: auto; opacity: 0.5; animation: floatSlogan 3s ease-in-out infinite; }
+
+    .side-decor { display: block; right: auto; left: -12px; top: 6%; height: 62%; margin-right: 0; z-index: 12; }
+    .side-decor img { height: 100%; width: auto; border-width: 1px; border-radius: 8px; }
+    .decor-overlay { top: -16%; height: 40%; }
+
+    .block-row { gap: 10px; margin-top: 14px; }
+    .frost-block { height: 40px; border-radius: 10px; }
+    .frost-block span { font-size: 24px; }
+
+    .status-bar { margin-top: 14px; }
+    .status-head h3 { font-size: 18px; }
+    .status-card { min-height: 50px; padding: 11px 12px; gap: 10px; }
+    .status-date { width: 52px; font-size: 18px; padding-right: 10px; }
+    .status-text { font-size: 12.5px; }
+    .lyric-player { margin-top: 14px; padding: 14px 14px 12px; border-radius: 14px; }
+    .lyric-head .track-name { font-size: 18px; }
+    .lyric-stage { height: 126px; }
+    .lyric-line { font-size: 12.5px; }
+    .lyric-line.active { font-size: 15px; }
+}
+
+@media (max-width: 480px) {
+    .card { width: 96vw; padding: 14px 12px 18px; border-radius: 14px; }
+    .left-panel { width: 30%; min-width: 86px; max-width: 110px; margin-right: 16px; }
+    .avatar-frame.f1, .avatar-frame.f2 { border-width: 1px; }
+    .decor-overlay { top: -14%; height: 36%; }
+    .side-decor { left: -8px; height: 55%; top: 8%; }
+    .circle-img { width: 36px; height: 36px; }
+    .bubble { font-size: 9.5px; padding: 3px 7px; border-radius: 10px; }
+    .top-section { margin-bottom: 10px; }
+    .info-list { gap: 5px; margin-bottom: 8px; }
+    .info-item { font-size: 12px; padding: 4px 8px; border-left-width: 3px; }
+    .slogan { font-size: 17px; letter-spacing: 2px; }
+    .block-row { gap: 6px; margin-top: 8px; }
+    .frost-block { height: 30px; border-radius: 8px; }
+    .frost-block span { font-size: 18px; }
+    .status-bar { margin-top: 10px; }
+    .status-head { margin-bottom: 10px; }
+    .status-head h3 { font-size: 16px; }
+    .status-card { min-height: 46px; padding: 10px; gap: 8px; border-radius: 10px; }
+    .status-card:hover { transform: none; }
+    .status-date { width: 44px; font-size: 16px; padding-right: 8px; letter-spacing: 2px; }
+    .status-text { font-size: 11.5px; line-height: 1.45; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== 第一屏 ===== -->
+<div class="fullscreen-img" id="fullscreenImg">
+    <div class="img-wrapper">
+        <div class="rotating-frame"></div>
+        <div class="rotating-frame frame-counter"></div>
+        <img src="https://Asamoisnailong.github.io/qianmo/1793963738281_1793963997730_cfii4.png" alt="展示图">
+    </div>
+    <div class="dust-layer"></div>
+</div>
+
+<!-- ===== 第二屏 ===== -->
+<div class="card-container" id="cardContainer">
+    <div class="card">
+
+        <!-- 左面板 -->
+        <div class="left-panel" id="leftPanel">
+            <div class="avatar-container">
+                <div class="avatar-frame f1"></div>
+                <div class="avatar-frame f2"></div>
+                <div class="side-decor">
+                    <img src="https://Asamoisnailong.github.io/qianmo/1793963806873_1793963991528_crd7r.png" alt="左侧装饰">
+                </div>
+                <img class="avatar-img" src="https://Asamoisnailong.github.io/qianmo/8_1793963446416_ddqg7.png" alt="人物图">
+                <div class="decor-overlay">
+                    <img src="https://Asamoisnailong.github.io/qianmo/IMG_20261106_200013_1793966465034_k8ns6.png" alt="装饰">
+                </div>
+            </div>
+
+            <!-- 三个白色透明方块（飞鸟集） -->
+            <div class="block-row">
+                <div class="frost-block" data-key="0"><span>飞</span></div>
+                <div class="frost-block" data-key="1"><span>鸟</span></div>
+                <div class="frost-block" data-key="2"><span>集</span></div>
+            </div>
+
+            <!-- 竖排状态栏：人物经历（点击看详情） -->
+            <div class="status-bar">
+                <div class="status-head">
+                    <h3>人物经历</h3>
+                    <span class="bar-line"></span>
+                </div>
+                <div class="status-viewport" id="statusViewport">
+                    <div class="status-track">
+                        <div class="status-card" data-key="0">
+                            <div class="status-date">幼时</div>
+                            <div class="status-text">出生在名声显赫的雷电家，取名散兵</div>
+                        </div>
+                        <div class="status-card" data-key="1">
+                            <div class="status-date">经历</div>
+                            <div class="status-text">出门游玩途中被孤儿院院长拐走，受大一岁孤儿故凝保护；后被家族找回</div>
+                        </div>
+                        <div class="status-card" data-key="2">
+                            <div class="status-date">如今</div>
+                            <div class="status-text">小学、初中期间遭霸凌，性情大变；因成绩优异跳级至高二B班，现为棒球社社员</div>
+                        </div>
+                        <div class="status-card" data-key="3">
+                            <div class="status-date">人际</div>
+                            <div class="status-text">雷电影：母亲。故凝：姐姐，同在孤儿院时护他，后被雷电家收为养女，霸凌期间始终相助</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右面板 -->
+        <div class="right-panel">
+            <div class="top-section">
+                <div class="circle-img">
+                    <img src="https://Asamoisnailong.github.io/qianmo/1793978362601_1793978485287_19djn.jpg" alt="缩略图1">
+                </div>
+                <div class="chat-area">
+                    <div class="bubble me">我爱你</div>
+                    <div class="bubble other">Ti amo</div>
+                </div>
+                <div class="circle-img right">
+                    <img src="https://Asamoisnailong.github.io/qianmo/1793978367480_EDIT_1793978394369_1793978488688_own6p.jpg" alt="缩略图2">
+                </div>
+            </div>
+
+            <div class="info-list">
+                <div class="info-item">年龄：16岁</div>
+                <div class="info-item">班级：高二b班</div>
+                <div class="info-item">喜：苦茶　　厌：甜品</div>
+            </div>
+
+            <!-- 歌词播放器 -->
+            <div class="lyric-player playing" id="lyricPlayer">
+                <div class="lyric-head">
+                    <h3 class="track-name">Oh To Be Loved</h3>
+                    <span class="bar-line"></span>
+                </div>
+                <div class="lyric-stage" id="lyricStage">
+                    <div class="lyric-tape" id="lyricTape"></div>
+                </div>
+                <div class="lyric-progress">
+                    <span class="time" id="lyricCur">0:00</span>
+                    <span class="track"><span class="fill" id="lyricFill"></span></span>
+                    <span class="time" id="lyricDur">0:00</span>
+                </div>
+                <div class="lyric-controls">
+                    <button class="lyric-btn" id="lyricToggle">暂停</button>
+                    <button class="lyric-btn" id="lyricRestart">重播</button>
+                </div>
+                <div class="cover-wrap">
+                    <img class="cover-img" id="coverImg"
+                         src="https://Asamoisnailong.github.io/qianmo/1793981998720_1793982027136_b8ykm.png"
+                         alt="翻唱封面">
+                    <div class="cover-fallback" id="coverFallback">封面图加载失败，可能是图片链接不可访问。<br>请检查地址或稍后重试。</div>
+                </div>
+            </div>
+
+            <div class="slogan">留在我身旁吧</div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== 模态弹窗 ===== -->
+<div class="modal-mask" id="modalMask">
+    <div class="modal-card">
+        <button class="modal-close" id="modalClose">✕</button>
+        <div class="modal-title" id="modalTitle">夏天的飞鸟</div>
+        <div class="modal-body" id="modalBody"></div>
+    </div>
+</div>
+
+<script>
+// ===== 第一屏 → 第二屏 =====
+const fullscreenImg = document.getElementById('fullscreenImg');
+const cardContainer = document.getElementById('cardContainer');
+fullscreenImg.addEventListener('click', () => {
+    fullscreenImg.classList.add('hidden');
+    cardContainer.classList.add('show');
+});
+
+// ===== 鼠标跟随（仅桌面，手机端关闭以免与滚动冲突） =====
+const leftPanel = document.getElementById('leftPanel');
+let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
+const isMobile = () => window.innerWidth <= 760;
+function handleMove(x, y) {
+    if (isMobile()) { targetX = 0; targetY = 0; return; }
+    targetX = ((x - window.innerWidth / 2) / (window.innerWidth / 2)) * 14;
+    targetY = ((y - window.innerHeight / 2) / (window.innerHeight / 2)) * 14;
+}
+window.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
+window.addEventListener('touchmove', e => { if (e.touches.length > 0) handleMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+window.addEventListener('resize', () => { if (isMobile()) targetX = targetY = 0; });
+(function animate() {
+    currentX += (targetX - currentX) * 0.08;
+    currentY += (targetY - currentY) * 0.08;
+    leftPanel.style.transform = `translate(${currentX}px, ${currentY}px)`;
+    requestAnimationFrame(animate);
+})();
+
+// ===== 三个方块 → 弹窗数据 =====
+const blockData = [
+    { title: '夏天的飞鸟', content: '夏天的飞鸟，飞到我的窗前唱歌，又飞去了。秋天的黄叶，它们没有什么可唱，只叹息一声，飞落在那里。' },
+    { title: '她的热切的脸', content: '她的热切的脸，如夜雨似的，搅扰着我的梦魂。' },
+    { title: '永恒的接吻', content: '世界对着它的爱人，把它浩翰的面具揭下了。它变小了，小如一首歌，小如一回永恒的接吻。' }
+];
+const modalMask = document.getElementById('modalMask');
+const modalTitle = document.getElementById('modalTitle');
+const modalBody = document.getElementById('modalBody');
+document.querySelectorAll('.frost-block').forEach(el => {
+    el.addEventListener('click', function(e) {
+        const d = blockData[this.dataset.key];
+        if (!d) return;
+        modalTitle.textContent = d.title;
+        modalBody.textContent = d.content;
+        modalMask.classList.add('active');
+        e.stopPropagation();
+    });
+});
+document.getElementById('modalClose').addEventListener('click', () => modalMask.classList.remove('active'));
+modalMask.addEventListener('click', e => { if (e.target === modalMask) modalMask.classList.remove('active'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && modalMask.classList.contains('active')) modalMask.classList.remove('active'); });
+
+// ===== 竖排状态栏：点击弹出详情 =====
+const expData = {
+    0: { title: '幼时', content: '出生在名声显赫的雷电家，取名散兵。' },
+    1: { title: '经历', content: '小时候出门游玩途中被孤儿院院长拐进孤儿院，受比自己大一岁的故凝保护。后来被家族找回。' },
+    2: { title: '如今', content: '小学、初中期间受到霸凌，性情大变。后因成绩优异跳级到高二B班，现为棒球社社员之一。' },
+    3: { title: '人际', content: '雷电影：母亲。\n故凝：姐姐。同孤儿院时因保护散兵，被雷电家族回报收为养女，在散兵被霸凌期间予以帮助。' }
+};
+const expModalTitle = document.getElementById('modalTitle');
+const expModalBody = document.getElementById('modalBody');
+document.querySelectorAll('.status-card').forEach(el => {
+    el.addEventListener('click', function(e) {
+        const d = expData[this.dataset.key];
+        if (!d) return;
+        expModalTitle.textContent = d.title;
+        expModalBody.textContent = d.content;
+        modalMask.classList.add('active');
+        e.stopPropagation();
+    });
+});
+
+// ===== 歌词播放器 =====
+const lyrics = [
+    ["Love is patient", "爱需要耐心"],
+    ["Love is kind", "爱需要仁慈"],
+    ["Love is the hardest thing to find", "爱是世间最难寻之物"],
+    ["Cuz I thought that I had found it", "因为我以为我已找到真爱"],
+    ["A good thing turned bad", "可曾经的美好已经变质"],
+    ["And I started to doubt it", "这让我开始质疑这份爱"],
+    ["Now I'm stuck here asking like", "如今被困原地 我不停追问"],
+    ["What does it take", "要怎样才能"],
+    ["To make it past the passion", "才能跨越激情阶段"],
+    ["And stick thru the pain", "携手熬过痛苦"],
+    ["Wondering is it even out there", "一直怀疑真爱是否存在"],
+    ["'Til you came in my life", "直到你出现"],
+    ["And showed me what it's like to be loved", "让我体会到被爱的感觉"],
+    ["I'll show you", "我会向你证明"],
+    ["What I would do", "我愿付出的行动"],
+    ["What I would say", "我愿诉说的誓言"],
+    ["The lengths I would go to the measures I'd take to be loved", "我愿跨越千山万水 竭尽全力只为被爱"],
+    ["Oh to be loved by oh to be loved by", "被爱"],
+    ["Someone who feels", "被对我有感觉的人爱"],
+    ["Someone who cares", "被在乎我的人爱"],
+    ["Someone who's simply there", "被默默陪伴我的人爱"],
+    ["Oh to be loved oh to be loved by", "被爱"],
+    ["Oh to be loved by you", "被你爱着"],
+    ["Love is painful", "爱伴随痛苦"],
+    ["Love is hard", "爱艰辛重重"],
+    ["Love can see beauty through the scars", "爱能透过伤痛窥见美好"],
+    ["There's an art to the anguish", "痛苦之中也蕴藏奥妙"],
+    ["A brawn to the brush-strokes on burgundy canvas", "绛红色的画布上 每一笔都充满力量"],
+    ["No one like You got that", "没人如你般"],
+    ["Perfect typa love", "拥有完美无瑕的爱"],
+    ["Only from above", "仿佛天赐一般"],
+    ["Nothing like I'm used to", "与我过往的感情截然不同"],
+    ["This gon take some getting used to", "这段感情还需要时间慢慢适应"],
+    ["Eternity could only be the right amount of time", "唯有相守到地老天荒"],
+    ["To show how much you mean in my life", "才能证明你在我生命中的分量"],
+    ["I'll show you", "我会向你证明"],
+    ["What I would do", "我愿付出的行动"],
+    ["What I would say", "我愿诉说的誓言"],
+    ["The lengths I would go to the measures I'd take to be loved", "我愿跨越千山万水 竭尽全力只为被爱"],
+    ["Oh to be loved by oh to be loved by", "被爱"],
+    ["Someone who feels", "被对我有感觉的人爱"],
+    ["Someone who cares", "被在乎我的人爱"],
+    ["Someone who's simply there", "被默默陪伴我的人爱"],
+    ["Oh to be loved oh to be loved by", "被爱"],
+    ["Oh to be loved by you", "被你爱着"],
+    ["Oh to be loved oh to be loved by", "被爱"],
+    ["Oh to be loved by you", "被你爱着"],
+    ["Oh to be loved oh to be loved by", "被爱"],
+    ["Oh to be loved by you", "被你爱着"]
+];
+const LINE_H = 30;             // 与 .lyric-line 高度一致
+const STEP_MS = 2600;         // 每句停留时长
+const tape = document.getElementById('lyricTape');
+const stage = document.getElementById('lyricStage');
+const fill = document.getElementById('lyricFill');
+const cur = document.getElementById('lyricCur');
+const dur = document.getElementById('lyricDur');
+const player = document.getElementById('lyricPlayer');
+const toggleBtn = document.getElementById('lyricToggle');
+let lineEls = [], idx = 0, total = lyrics.length, timer = null, playing = true;
+
+function fmt(s) {
+    const m = Math.floor(s / 60), ss = Math.floor(s % 60);
+    return m + ':' + (ss < 10 ? '0' : '') + ss;
+}
+function buildLyrics() {
+    tape.innerHTML = '';
+    lineEls = lyrics.map(pair => {
+        const wrap = document.createElement('div');
+        wrap.className = 'lyric-line';
+        wrap.textContent = pair[0] + '　' + pair[1];
+        tape.appendChild(wrap);
+        return wrap;
+    });
+    dur.textContent = fmt(total * (STEP_MS / 1000));
+}
+function scrollTo(i) {
+    const center = stage.clientHeight / 2 - LINE_H / 2;
+    tape.style.transition = 'transform 0.6s cubic-bezier(0.33, 1, 0.6, 1)';
+    tape.style.transform = `translateY(${center - i * LINE_H}px)`;
+    lineEls.forEach((el, k) => el.classList.toggle('active', k === i));
+    fill.style.width = ((i + 1) / total * 100) + '%';
+    cur.textContent = fmt((i + 1) * STEP_MS / 1000);
+}
+function next() {
+    idx++;
+    if (idx >= total) { idx = 0; }
+    scrollTo(idx);
+}
+function start() {
+    stop(); playing = true; player.classList.add('playing');
+    toggleBtn.textContent = '暂停';
+    timer = setInterval(next, STEP_MS);
+}
+function stop() {
+    if (timer) { clearInterval(timer); timer = null; }
+    player.classList.remove('playing');
+}
+function pause() {
+    playing = false; stop(); toggleBtn.textContent = '播放';
+}
+function resume() {
+    playing = true; player.classList.add('playing'); toggleBtn.textContent = '暂停';
+    timer = setInterval(next, STEP_MS);
+}
+toggleBtn.addEventListener('click', () => playing ? pause() : resume());
+document.getElementById('lyricRestart').addEventListener('click', () => {
+    idx = 0; scrollTo(0); start();
+});
+buildLyrics();
+scrollTo(0);
+start();
+
+// ===== 封面图加载兜底 =====
+(function () {
+    const img = document.getElementById('coverImg');
+    const fb = document.getElementById('coverFallback');
+    if (!img || !fb) return;
+    function fail() { img.classList.add('hidden'); fb.classList.add('show'); }
+    if (img.complete) { if (!img.naturalWidth) fail(); }
+    else { img.addEventListener('error', fail); }
+    img.addEventListener('load', () => { if (!img.naturalWidth) fail(); });
+})();
+</script>
+</body>
+</html>
