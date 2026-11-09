@@ -19,11 +19,11 @@
     padding: 0;
     width: 100%;
     height: 100%;
-    position: fixed;                     /* 移动端彻底锁死滚动 */
+    position: fixed;
     overflow: hidden;
-    overscroll-behavior: none;           /* 禁止回弹 */
-    -webkit-overflow-scrolling: auto;
-    touch-action: none;                  /* 禁止浏览器接管触摸手势 */
+    overscroll-behavior: none;
+    /* ★ 修改：允许垂直滑动，不再锁死页面 */
+    touch-action: pan-y; 
     background: #ffffff;
     display: flex;
     align-items: center;
@@ -39,7 +39,7 @@
     background: transparent;
     border-radius: 20px;
     cursor: pointer;
-    touch-action: none;
+    touch-action: pan-y;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
@@ -123,7 +123,7 @@
     100% { background-position: -12px 128%, 0 0; }
   }
 
-  /* 图一包裹层（含S型红线） */
+  /* 图一包裹层 */
   .top-img-wrapper {
     top: 6px;
     left: -94px; 
@@ -151,7 +151,7 @@
     z-index: 5;
   }
 
-  /* 右下角新图 + 缠绕红线 */
+  /* 右下角新图 */
   .corner-wrapper {
     right: 8px;
     bottom: 4px;
@@ -180,7 +180,7 @@
     z-index: 5;
   }
 
-  /* 文字块（包含缠绕红绳） */
+  /* 文字块 */
   .text-block {
     top: 34px;
     right: 22px;
@@ -190,9 +190,7 @@
     pointer-events: none;
     color: rgba(49, 46, 42, 0.984);
     filter: blur(0.35px);
-    text-shadow: 
-      0 0 4px rgba(142, 140, 135, 0.002),
-      0 0 10px rgba(152, 155, 151, 0.001);
+    text-shadow: 0 0 4px rgba(142, 140, 135, 0.002), 0 0 10px rgba(152, 155, 151, 0.001);
     letter-spacing: 0.4px;
     transform-style: preserve-3d;
     position: absolute;
@@ -208,7 +206,6 @@
     opacity: 0.912;
   }
 
-  /* 缠绕红绳 SVG 层 */
   .wrap-thread {
     position: absolute;
     top: -6px;
@@ -224,48 +221,34 @@
 <body>
 
 <div class="container" id="container">
-
-  <!-- 底图 -->
   <div class="layer bottom-bg" data-depth="0.15">
-    <img src="https://Asamoisnailong.github.io/qianmo/1_1793846194156_mud1r.jpg" alt="底图">
+    < img src="https://Asamoisnailong.github.io/qianmo/1_1793846194156_mud1r.jpg" alt="底图">
     <div class="bg-particle-overlay"></div>
   </div>
-
-  <!-- 远景碎雪 -->
   <div class="layer snow-far" data-depth="0.4"></div>
-
-  <!-- 图一 + S型红线 -->
   <div class="layer top-img-wrapper" data-depth="1.0">
-    <img src="https://Asamoisnailong.github.io/qianmo/4_1793849874904_k8i1n.png" alt="图一">
+    < img src="https://Asamoisnailong.github.io/qianmo/4_1793849874904_k8i1n.png" alt="图一">
     <svg class="red-thread-main" viewBox="0 0 522 521" xmlns="http://www.w3.org/2000/svg">
       <path id="mainThreadPath" d="" stroke="#d64040" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
     </svg>
   </div>
-
-  <!-- 右下角新图 + 缠绕红线 -->
   <div class="layer corner-wrapper" data-depth="0.35">
-    <img src="https://Asamoisnailong.github.io/qianmo/1793895849894_1793895937880_dpsr5.png" alt="右下角装饰">
+    < img src="https://Asamoisnailong.github.io/qianmo/1793895849894_1793895937880_dpsr5.png" alt="右下角装饰">
     <svg class="red-thread-corner" viewBox="0 0 264 263" xmlns="http://www.w3.org/2000/svg">
       <path id="cornerThreadPath" d="" stroke="#d64040" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
     </svg>
   </div>
-
-  <!-- 近景碎雪 -->
   <div class="layer snow-near" data-depth="1.8"></div>
-
-  <!-- 文字 + 加长圆润缠绕红绳 -->
   <div class="layer text-block" data-depth="0.6">
-    <p>The bird wishes it were a cloud.</p>
-    <p>The cloud wishes it were a bird.</p>
+    <p>The bird wishes it were a cloud.</p >
+    <p>The cloud wishes it were a bird.</p >
     <svg class="wrap-thread" viewBox="0 0 1018 161" xmlns="http://www.w3.org/2000/svg">
       <path id="wrapPath" d="" stroke="#d64040" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
     </svg>
   </div>
-
 </div>
 
 <script>
-  // ========== 缩放适配 ==========
   const container = document.getElementById('container');
   const BASE_W = 964;
   const BASE_H = 644;
@@ -279,8 +262,8 @@
     container.style.top = `${(winH - BASE_H * s) / 2}px`;
   }
   doResize();
+  window.addEventListener('resize', doResize);
 
-  // ========== 视差系统（极低lerp，无旋转） ==========
   const layers = [...document.querySelectorAll('.layer')];
   let targetX = 0, targetY = 0;
   let curX = 0, curY = 0;
@@ -296,36 +279,26 @@
     targetY = (rawY - cy) / (BASE_H / 2);
   }
 
+  // ★ 只保留电脑鼠标的跟随
   container.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
-
-  // 关键：passive 必须为 false，才能 preventDefault 锁死滚动
-  container.addEventListener('touchmove', e => {
-    e.preventDefault();
-    if (e.touches.length) onMove(e.touches[0].clientX, e.touches[0].clientY);
-  }, { passive: false });
-
+  
+  // ★ 删除了 touchmove 里的视差和拦截，手机端滑动不再抽搐！
+  
   container.addEventListener('mouseleave', () => { targetX = 0; targetY = 0; });
-  container.addEventListener('touchend', () => { targetX = 0; targetY = 0; });
 
-  // ========== 所有动画合并到一个 RAF ==========
   const mainThread = document.getElementById('mainThreadPath');
   const mw = 524, mh = 523;
   let angleMain = 0;
-
   const cornerThread = document.getElementById('cornerThreadPath');
   const cw = 266, ch = 265;
   let angleCorner = 0;
-
   const wrapPath = document.getElementById('wrapPath');
-  const ww = 1022, wh = 169;
+  const ww = 1022;
   let phaseWrap = 0;
 
   function mainLoop() {
-    // --- 视差 ---
     curX += (targetX - curX) * 0.014;
     curY += (targetY - curY) * 0.013;
-
-    // 钳制在 [-1, 1]，防止飞出抖动
     curX = Math.max(-1, Math.min(1, curX));
     curY = Math.max(-1, Math.min(1, curY));
 
@@ -336,17 +309,13 @@
       layer.style.transform = `translate3d(${px}px, ${py}px, 0)`;
     });
 
-    // --- 图一 S型红线 ---
     angleMain += 0.023;
     const pts1 = [];
-    const steps1 = 200;
-    for (let i = 0; i <= steps1; i++) {
-      const t = i / steps1;
+    for (let i = 0; i <= 200; i++) {
+      const t = i / 200;
       const theta = t * Math.PI * 2 + angleMain;
-      const rx = mw * 0.387;
-      const ry = mh * 0.372;
-      const cx = mw / 2;
-      const cy = mh / 2;
+      const rx = mw * 0.387, ry = mh * 0.372;
+      const cx = mw / 2, cy = mh / 2;
       const sMod = Math.sin(t * Math.PI * 4 + angleMain * 0.7) * 0.22;
       const x = cx + Math.cos(theta) * rx * (1 + sMod);
       const y = cy + Math.sin(theta) * ry * (1 - sMod);
@@ -354,17 +323,13 @@
     }
     mainThread.setAttribute('d', `M${pts1.join(' L')}`);
 
-    // --- 右下角 S型红线 ---
     angleCorner += 0.034;
     const pts2 = [];
-    const steps2 = 130;
-    for (let i = 0; i <= steps2; i++) {
-      const t = i / steps2;
+    for (let i = 0; i <= 130; i++) {
+      const t = i / 130;
       const theta = t * Math.PI * 2 + angleCorner;
-      const rx = cw * 0.373;
-      const ry = ch * 0.361;
-      const cx = cw / 2;
-      const cy = ch / 2;
+      const rx = cw * 0.373, ry = ch * 0.361;
+      const cx = cw / 2, cy = ch / 2;
       const sMod = Math.sin(t * Math.PI * 4 + angleCorner * 0.7) * 0.17;
       const x = cx + Math.cos(theta) * rx * (1 + sMod);
       const y = cy + Math.sin(theta) * ry * (1 - sMod);
@@ -372,20 +337,16 @@
     }
     cornerThread.setAttribute('d', `M${pts2.join(' L')}`);
 
-    // --- 文字缠绕红绳 ---
     phaseWrap += 0.036;
     const pts3 = [];
-    const segs = 460;
-    const base1 = 36;
-    const base2 = 90;
-    for (let i = 0; i <= segs; i++) {
-      const t = i / segs;
+    for (let i = 0; i <= 460; i++) {
+      const t = i / 460;
       const x = t * ww;
       const wave1 = Math.sin(x * 0.032 + phaseWrap) * 16;
       const wave2 = Math.sin(x * 0.056 + phaseWrap * 1.2) * 5;
       const wave3 = Math.sin(x * 0.006 + phaseWrap * 0.5) * 12;
       const baseMix = 0.5 + 0.5 * Math.sin(x * 0.022 + phaseWrap * 0.7);
-      const baseY = base1 * (1 - baseMix) + base2 * baseMix;
+      const baseY = 36 * (1 - baseMix) + 90 * baseMix;
       const y = baseY + wave1 + wave2 + wave3;
       pts3.push(`${x.toFixed(1)},${y.toFixed(1)}`);
     }
@@ -395,7 +356,7 @@
   }
   mainLoop();
 
-  // ========== 点击迸发效果（去重） ==========
+  // ========== 点击迸发效果（只保留点击，且加了防误触） ==========
   let lastBurstTime = 0;
 
   container.addEventListener('click', function(e) {
@@ -414,11 +375,11 @@
       const rawY = (e.touches[0].clientY - rect.top) / scaleVal;
       burstSnow(rawX, rawY);
     }
-  }, { passive: false });
+  }, { passive: true });
 
   function burstSnow(cx, cy) {
     const now = Date.now();
-    if (now - lastBurstTime < 200) return;   // 200ms 内只触发一次
+    if (now - lastBurstTime < 200) return;
     lastBurstTime = now;
 
     const count = 40;
@@ -427,17 +388,7 @@
       const el = document.createElement('div');
       el.className = 'burst-snow';
       const size = 2 + Math.random() * 3.5;
-      el.style.cssText = `
-        position: absolute;
-        width: ${size}px;
-        height: ${size}px;
-        background: rgba(255,255,255,${0.7 + Math.random() * 0.3});
-        border-radius: 50%;
-        pointer-events: none;
-        left: ${cx}px;
-        top: ${cy}px;
-        will-change: transform, opacity;
-      `;
+      el.style.cssText = `position: absolute; width: ${size}px; height: ${size}px; background: rgba(255,255,255,${0.7 + Math.random() * 0.3}); border-radius: 50%; pointer-events: none; left: ${cx}px; top: ${cy}px; will-change: transform, opacity;`;
       fragment.appendChild(el);
     }
     container.appendChild(fragment);
