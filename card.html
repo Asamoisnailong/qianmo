@@ -1,68 +1,46 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>碎雪视差·极简纯静态版</title>
-<link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet">
 <style>
-  @font-face {
-    font-family: 'Aidian SignatureTi Marker pen';
-    src: url('https://www.fonts.net.cn/ttf/Aidian-SignatureTi-Marker-pen-Medium-2.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
+  body { margin: 0; padding: 0; background: #fff; overflow: hidden; }
+  .container { position: relative; width: 100vw; height: 100vh; }
+  /* 底图 */
+  .bg { 
+    position: absolute; top: 14%; right: 2%; width: 70%; height: 70%; 
+    background: url("https://Asamoisnailong.github.io/qianmo/1_1793846194156_mud1r.jpg") center/cover no-repeat; 
+    border-radius: 16px; 
   }
-
-  html, body {
-    margin: 0; padding: 0; width: 100%; height: 100%;
-    background: #ffffff; display: flex; align-items: center; justify-content: center;
-    overflow: hidden; overscroll-behavior: none;
+  /* 图一 */
+  .top { 
+    position: absolute; top: 2%; left: -5%; width: 55%; height: 80%; 
+    background: url("https://Asamoisnailong.github.io/qianmo/4_1793849874904_k8i1n.png") center/contain no-repeat; 
+    filter: drop-shadow(0 20px 48px rgba(0,0,0,0.3));
   }
-
-  .container {
-    position: relative; width: 100vw; height: 100vh;
-    overflow: hidden; background: transparent;
+  /* 右下角 */
+  .corner { 
+    position: absolute; right: 2%; bottom: 2%; width: 28%; height: 40%; 
+    background: url("https://Asamoisnailong.github.io/qianmo/1793895849894_1793895937880_dpsr5.png") center/contain no-repeat; 
+    filter: drop-shadow(0 12px 32px rgba(0,0,0,0.2));
   }
-
-  .bottom-bg { position: absolute; top: 14%; right: 2%; width: 70%; height: 70%; z-index: 1; }
-  .bottom-bg img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
-
-  .top-img-wrapper { position: absolute; top: 2%; left: -5%; width: 55%; height: 80%; z-index: 10; display: flex; align-items: center; justify-content: center; }
-  .top-img-wrapper img { width: 86%; height: 85%; object-fit: contain; border-radius: 16px; filter: drop-shadow(0 20px 48px rgba(0,0,0,0.335)); }
-  
-  .corner-wrapper { position: absolute; right: 2%; bottom: 2%; width: 28%; height: 40%; z-index: 12; display: flex; align-items: center; justify-content: center; }
-  .corner-wrapper img { width: 86%; height: 87%; object-fit: contain; filter: drop-shadow(0 12px 32px rgba(0,0,0,0.265)); opacity: 0.942; }
-
-  .text-block { position: absolute; top: 5%; right: 3%; z-index: 22; font-family: 'Aidian SignatureTi Marker pen', 'Alex Brush', cursive; text-align: right; color: rgba(49, 46, 42, 0.984); }
-  .text-block p { margin: 0; font-size: 1.8rem; line-height: 1.5; white-space: nowrap; }
-  .text-block p:last-child { font-size: 1.6rem; opacity: 0.912; }
+  /* 文字 */
+  .text { 
+    position: absolute; top: 5%; right: 3%; 
+    font-family: 'Brush Script MT', 'Segoe Print', cursive; 
+    text-align: right; color: #31302a; 
+  }
+  .text p { margin: 0; font-size: 1.6rem; line-height: 1.5; font-style: italic; }
 </style>
 </head>
 <body>
-
 <div class="container">
-  <!-- 底图 -->
-  <div class="bottom-bg">
-    < img src="https://Asamoisnailong.github.io/qianmo/1_1793846194156_mud1r.jpg" alt="底图">
-  </div>
-
-  <!-- 图一 -->
-  <div class="top-img-wrapper">
-    < img src="https://Asamoisnailong.github.io/qianmo/4_1793849874904_k8i1n.png" alt="图一">
-  </div>
-
-  <!-- 右下角 -->
-  <div class="corner-wrapper">
-    < img src="https://Asamoisnailong.github.io/qianmo/1793895849894_1793895937880_dpsr5.png" alt="右下角装饰">
-  </div>
-
-  <!-- 文字 -->
-  <div class="text-block">
+  <div class="bg"></div>
+  <div class="top"></div>
+  <div class="corner"></div>
+  <div class="text">
     <p>The bird wishes it were a cloud.</p >
     <p>The cloud wishes it were a bird.</p >
   </div>
 </div>
-
 </body>
 </html>
