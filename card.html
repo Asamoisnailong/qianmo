@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>碎雪视差·纯净静态版</title>
+<title>碎雪视差·极简纯静态版</title>
 <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet">
 <style>
   @font-face {
@@ -15,314 +15,54 @@
   }
 
   html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    overflow: hidden;
-    overscroll-behavior: none;
-    /* 允许正常的上下滑动 */
-    touch-action: pan-y; 
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    background: #ffffff; display: flex; align-items: center; justify-content: center;
+    overflow: hidden; overscroll-behavior: none;
   }
 
   .container {
-    position: absolute;
-    width: 962px;
-    height: 642px;
-    transform-origin: 0 0;
-    overflow: hidden;
-    background: transparent;
-    border-radius: 20px;
-    touch-action: pan-y;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
+    position: relative; width: 100vw; height: 100vh;
+    overflow: hidden; background: transparent;
   }
 
-  .layer {
-    position: absolute;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-  }
+  .bottom-bg { position: absolute; top: 14%; right: 2%; width: 70%; height: 70%; z-index: 1; }
+  .bottom-bg img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
 
-  /* 底图 */
-  .bottom-bg {
-    top: 90px;
-    right: 8px;
-    width: 680px;
-    height: 445px;
-    z-index: 1;
-  }
-  .bottom-bg img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 16px;
-  }
-  .bg-particle-overlay {
-    position: absolute;
-    inset: 0;
-    border-radius: 16px;
-    background-image: 
-      radial-gradient(circle at 21% 39%, rgba(239,229,219,0.22) 2px, transparent 3px),
-      radial-gradient(circle at 73% 57%, rgba(216,206,195,0.11) 1px, transparent 2px),
-      radial-gradient(circle at 51% 65%, rgba(186,176,166,0.16) 2px, transparent 3px);
-    background-size: 119px 116px;
-    animation: particleMove 32s linear infinite;
-    pointer-events: none;
-  }
-  @keyframes particleMove {
-    0% { background-position: 0 0; }
-    100% { background-position: 357px 464px; }
-  }
+  .top-img-wrapper { position: absolute; top: 2%; left: -5%; width: 55%; height: 80%; z-index: 10; display: flex; align-items: center; justify-content: center; }
+  .top-img-wrapper img { width: 86%; height: 85%; object-fit: contain; border-radius: 16px; filter: drop-shadow(0 20px 48px rgba(0,0,0,0.335)); }
+  
+  .corner-wrapper { position: absolute; right: 2%; bottom: 2%; width: 28%; height: 40%; z-index: 12; display: flex; align-items: center; justify-content: center; }
+  .corner-wrapper img { width: 86%; height: 87%; object-fit: contain; filter: drop-shadow(0 12px 32px rgba(0,0,0,0.265)); opacity: 0.942; }
 
-  /* 远景碎雪 */
-  .snow-far {
-    inset: -20% 0 0 0;
-    width: 106%;
-    height: 145%;
-    z-index: 6;
-    pointer-events: none;
-    background-image:
-      radial-gradient(circle, rgba(220,215,209,0.07) 1.5px, transparent 2px),
-      radial-gradient(circle, rgba(241,236,229,0.045) 1.5px, transparent 2px),
-      radial-gradient(circle, rgba(188,178,166,0.015) 2px, transparent 2.5px);
-    background-size: 66px 64px, 121px 120px, 178px 174px;
-    background-position: 0 0, 42px 50px, 93px 25px;
-    animation: snowFallFar 26s linear infinite;
-  }
-  @keyframes snowFallFar {
-    0%   { background-position: 0 -10%, -20px 0; }
-    100% { background-position: 0 110%, 104px 0; }
-  }
-
-  /* 近景碎雪 */
-  .snow-near {
-    inset: -25% 0 0 0;
-    width: 108%;
-    height: 154%;
-    z-index: 18;
-    pointer-events: none;
-    background-image:
-      radial-gradient(circle, rgba(255,251,246,0.938) 2.2px, transparent 3.2px),
-      radial-gradient(circle, rgba(255,253,249,0.728) 2.8px, transparent 3.8px),
-      radial-gradient(circle, rgba(255,253,254,0.882) 1.6px, transparent 2.6px);
-    background-size: 46px 45px, 76px 70px, 156px 150px;
-    background-position: 2px 0, 28px 22px, 54px 68px;
-    animation: snowFallNear 16s linear infinite;
-  }
-  @keyframes snowFallNear {
-    0%   { background-position: 0 -12%, 0 0; }
-    50%  { background-position: 18px 56%, 8px 0; }
-    100% { background-position: -12px 128%, 0 0; }
-  }
-
-  /* 图一包裹层 */
-  .top-img-wrapper {
-    top: 6px;
-    left: -94px; 
-    width: 518px;  
-    height: 517px; 
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .top-img-wrapper img {
-    width: 86%;
-    height: 85%;
-    object-fit: contain; 
-    border-radius: 16px;
-    filter: drop-shadow(0 20px 48px rgba(0,0,0,0.335));
-  }
-  .red-thread-main {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 5;
-  }
-
-  /* 右下角新图 */
-  .corner-wrapper {
-    right: 8px;
-    bottom: 4px;
-    width: 256px;
-    height: 254px;
-    z-index: 12;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
-  .corner-wrapper img {
-    width: 86%;
-    height: 87%;
-    object-fit: contain;
-    filter: drop-shadow(0 12px 32px rgba(0,0,0,0.265));
-    opacity: 0.942;
-  }
-  .red-thread-corner {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 5;
-  }
-
-  /* 文字块 */
-  .text-block {
-    top: 34px;
-    right: 22px;
-    z-index: 22;
-    font-family: 'Aidian SignatureTi Marker pen', 'Alex Brush', 'Brush Script MT', 'Segoe Print', cursive;
-    text-align: right;
-    pointer-events: none;
-    color: rgba(49, 46, 42, 0.984);
-    filter: blur(0.35px);
-    text-shadow: 0 0 4px rgba(142, 140, 135, 0.002), 0 0 10px rgba(152, 155, 151, 0.001);
-    letter-spacing: 0.4px;
-    position: absolute;
-  }
-  .text-block p {
-    margin: 0;
-    font-size: 32px;
-    line-height: 1.542;
-    white-space: nowrap;
-  }
-  .text-block p:last-child {
-    font-size: 29px;
-    opacity: 0.912;
-  }
-
-  .wrap-thread {
-    position: absolute;
-    top: -6px;
-    left: -18px;
-    width: 1002px;
-    height: 145px;
-    pointer-events: none;
-    overflow: visible;
-    z-index: 23;
-  }
+  .text-block { position: absolute; top: 5%; right: 3%; z-index: 22; font-family: 'Aidian SignatureTi Marker pen', 'Alex Brush', cursive; text-align: right; color: rgba(49, 46, 42, 0.984); }
+  .text-block p { margin: 0; font-size: 1.8rem; line-height: 1.5; white-space: nowrap; }
+  .text-block p:last-child { font-size: 1.6rem; opacity: 0.912; }
 </style>
 </head>
 <body>
 
-<div class="container" id="container">
-  <div class="layer bottom-bg">
+<div class="container">
+  <!-- 底图 -->
+  <div class="bottom-bg">
     < img src="https://Asamoisnailong.github.io/qianmo/1_1793846194156_mud1r.jpg" alt="底图">
-    <div class="bg-particle-overlay"></div>
   </div>
-  <div class="layer snow-far"></div>
-  <div class="layer top-img-wrapper">
+
+  <!-- 图一 -->
+  <div class="top-img-wrapper">
     < img src="https://Asamoisnailong.github.io/qianmo/4_1793849874904_k8i1n.png" alt="图一">
-    <svg class="red-thread-main" viewBox="0 0 522 521" xmlns="http://www.w3.org/2000/svg">
-      <path id="mainThreadPath" d="" stroke="#d64040" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
   </div>
-  <div class="layer corner-wrapper">
+
+  <!-- 右下角 -->
+  <div class="corner-wrapper">
     < img src="https://Asamoisnailong.github.io/qianmo/1793895849894_1793895937880_dpsr5.png" alt="右下角装饰">
-    <svg class="red-thread-corner" viewBox="0 0 264 263" xmlns="http://www.w3.org/2000/svg">
-      <path id="cornerThreadPath" d="" stroke="#d64040" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
   </div>
-  <div class="layer snow-near"></div>
-  <div class="layer text-block">
+
+  <!-- 文字 -->
+  <div class="text-block">
     <p>The bird wishes it were a cloud.</p >
     <p>The cloud wishes it were a bird.</p >
-    <svg class="wrap-thread" viewBox="0 0 1018 161" xmlns="http://www.w3.org/2000/svg">
-      <path id="wrapPath" d="" stroke="#d64040" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
   </div>
 </div>
 
-<script>
-  // 纯粹只负责缩放适配
-  const container = document.getElementById('container');
-  const BASE_W = 964;
-  const BASE_H = 644;
-
-  function doResize() {
-    const winW = window.innerWidth;
-    const winH = window.innerHeight;
-    const s = Math.min(winW / BASE_W, winH / BASE_H, 1);
-    container.style.transform = `scale(${s})`;
-    container.style.left = `${(winW - BASE_W * s) / 2}px`;
-    container.style.top = `${(winH - BASE_H * s) / 2}px`;
-  }
-  doResize();
-  window.addEventListener('resize', doResize);
-
-  // 只有红绳的自动游走动画，没有任何鼠标/手指事件
-  const mainThread = document.getElementById('mainThreadPath');
-  const mw = 524, mh = 523;
-  let angleMain = 0;
-
-  const cornerThread = document.getElementById('cornerThreadPath');
-  const cw = 266, ch = 265;
-  let angleCorner = 0;
-
-  const wrapPath = document.getElementById('wrapPath');
-  const ww = 1022;
-  let phaseWrap = 0;
-
-  function mainLoop() {
-    // 图一 S型红线
-    angleMain += 0.023;
-    const pts1 = [];
-    for (let i = 0; i <= 200; i++) {
-      const t = i / 200;
-      const theta = t * Math.PI * 2 + angleMain;
-      const rx = mw * 0.387, ry = mh * 0.372;
-      const cx = mw / 2, cy = mh / 2;
-      const sMod = Math.sin(t * Math.PI * 4 + angleMain * 0.7) * 0.22;
-      const x = cx + Math.cos(theta) * rx * (1 + sMod);
-      const y = cy + Math.sin(theta) * ry * (1 - sMod);
-      pts1.push(`${x.toFixed(1)},${y.toFixed(1)}`);
-    }
-    mainThread.setAttribute('d', `M${pts1.join(' L')}`);
-
-    // 右下角 S型红线
-    angleCorner += 0.034;
-    const pts2 = [];
-    for (let i = 0; i <= 130; i++) {
-      const t = i / 130;
-      const theta = t * Math.PI * 2 + angleCorner;
-      const rx = cw * 0.373, ry = ch * 0.361;
-      const cx = cw / 2, cy = ch / 2;
-      const sMod = Math.sin(t * Math.PI * 4 + angleCorner * 0.7) * 0.17;
-      const x = cx + Math.cos(theta) * rx * (1 + sMod);
-      const y = cy + Math.sin(theta) * ry * (1 - sMod);
-      pts2.push(`${x.toFixed(1)},${y.toFixed(1)}`);
-    }
-    cornerThread.setAttribute('d', `M${pts2.join(' L')}`);
-
-    // 文字缠绕红绳
-    phaseWrap += 0.036;
-    const pts3 = [];
-    for (let i = 0; i <= 460; i++) {
-      const t = i / 460;
-      const x = t * ww;
-      const wave1 = Math.sin(x * 0.032 + phaseWrap) * 16;
-      const wave2 = Math.sin(x * 0.056 + phaseWrap * 1.2) * 5;
-      const wave3 = Math.sin(x * 0.006 + phaseWrap * 0.5) * 12;
-      const baseMix = 0.5 + 0.5 * Math.sin(x * 0.022 + phaseWrap * 0.7);
-      const baseY = 36 * (1 - baseMix) + 90 * baseMix;
-      const y = baseY + wave1 + wave2 + wave3;
-      pts3.push(`${x.toFixed(1)},${y.toFixed(1)}`);
-    }
-    wrapPath.setAttribute('d', `M${pts3.join(' L')}`);
-
-    requestAnimationFrame(mainLoop);
-  }
-  mainLoop();
-</script>
 </body>
 </html>
